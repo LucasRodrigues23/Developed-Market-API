@@ -17,6 +17,7 @@ import os
 import dj_database_url
 import dotenv
 
+dotenv.load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -50,7 +51,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "silk",
-    # "drf_spectacular",
+    "drf_spectacular",
 ]
 
 MY_APPS = [
@@ -180,8 +181,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'bandkamp API',
-    'DESCRIPTION': 'Entrega sprint 5',
+    'TITLE': 'Market place API',
+    'DESCRIPTION': 'Entrega em grupo sprint 7-8',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS

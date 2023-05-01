@@ -1,0 +1,7 @@
+openapi: 3.0.3
+info:
+  title: Market place API
+  version: 1.0.0
+  description: Entrega em grupo sprint 7-8
+paths: {}
+components: {}
