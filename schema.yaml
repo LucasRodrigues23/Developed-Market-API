@@ -84,8 +84,86 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
+  /api/users/address/:
+    post:
+      operationId: api_users_address_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Address'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
 components:
   schemas:
+    Address:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        country:
+          type: string
+          maxLength: 30
+        state:
+          type: string
+          maxLength: 30
+        city:
+          type: string
+          maxLength: 50
+        district:
+          type: string
+          maxLength: 30
+        street:
+          type: string
+          maxLength: 50
+        number:
+          type: string
+          maxLength: 10
+        cep:
+          type: string
+          pattern: ^\d{5}-\d{3}$
+          maxLength: 9
+        complement:
+          type: string
+          nullable: true
+          maxLength: 100
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+      - cep
+      - city
+      - country
+      - district
+      - id
+      - number
+      - state
+      - street
+      - updated_at
+      - user_id
     CustomJWT:
       type: object
       properties:
