@@ -38,4 +38,4 @@ class AddressSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data: dict) -> Address:
-        return Address.objects.create_user(**validated_data)
+        return Address.objects.create(**validated_data)
