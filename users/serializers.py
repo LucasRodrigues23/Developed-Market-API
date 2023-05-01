@@ -48,9 +48,11 @@ class UserSerializer(serializers.ModelSerializer):
         is_superuser = validated_data.pop("is_superuser", None)
 
         if is_superuser:
+            validated_data["is_seller"] = False
+            validated_data["is_client"] = False
             return User.objects.create_superuser(**validated_data)
 
-        if validated_data["is_client"] is True:
+        if validated_data["is_seller"] is True:
             return User.objects.create_user(**validated_data)
 
         return User.objects.create_user(**validated_data)
