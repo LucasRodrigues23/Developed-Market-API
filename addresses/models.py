@@ -13,3 +13,6 @@ class Address(models.Model):
     number = models.CharField(max_length=10)
     cep = models.CharField(max_length=9)
     complement = models.CharField(max_length=100, null=True, blank=True, default=None)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    user = models.OneToOneField("users.User", on_delete=models.CASCADE)
