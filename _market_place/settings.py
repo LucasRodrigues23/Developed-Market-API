@@ -56,8 +56,7 @@ THIRD_PARTY_APPS = [
 
 MY_APPS = [
     "users",
-    # "albums",
-    # "songs",
+    "addresses",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
