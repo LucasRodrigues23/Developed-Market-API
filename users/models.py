@@ -10,6 +10,7 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=100)
 
     email = models.EmailField(max_length=127, unique=True)
+    cpf = models.CharField(max_length=14, unique=True)
 
     bio = models.TextField(null=True, blank=True, default=None)
     birthdate = models.DateField(null=True, blank=True)

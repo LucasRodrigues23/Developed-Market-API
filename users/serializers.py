@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from django.core.validators import RegexValidator
 from .models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
@@ -17,6 +18,34 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[UniqueValidator(queryset=User.objects.all())],
     )
 
+    cpf = serializers.CharField(
+        max_length=14,
+        validators=[
+            RegexValidator(
+                regex=r"^\d{3}\.\d{3}\.\d{3}-\d{2}$",
+                message="CPF inválido. Use o formato XXX.XXX.XXX-XX.",
+                code="invalid_cpf",
+            ),
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="A user with that cpf already exists.",
+            ),
+        ],
+    )
+
+    password = serializers.CharField(
+        max_length=128,
+        min_length=8,
+        write_only=True,
+        validators=[
+            RegexValidator(
+                regex=r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$",
+                message="The password must  including at least one uppercase letter, one lowercase letter, one number, and one special character.",
+                code="invalid_password",
+            )
+        ],
+    )
+
     class Meta:
         model = User
 
@@ -27,6 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
             "username",
             "password",
             "email",
+            "cpf",
             "bio",
             "birthdate",
             "is_superuser",
