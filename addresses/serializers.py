@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Address
 from django.core.validators import RegexValidator
+from rest_framework.validators import UniqueValidator
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -9,7 +10,7 @@ class AddressSerializer(serializers.ModelSerializer):
         validators=[
             RegexValidator(
                 regex=r"^\d{5}-\d{3}$",
-                message="CEP inválido. Use o formato XXXXX-XXX.",
+                message="Invalid ZIP code format. Use the format XXXXX-XXX.",
                 code="invalid_cep",
             )
         ],
@@ -38,4 +39,9 @@ class AddressSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data: dict) -> Address:
+        user_id = validated_data.get("user").id
+        if Address.objects.filter(user_id=user_id).exists():
+            raise serializers.ValidationError(
+                {"message": "User already has a registered address."}
+            )
         return Address.objects.create(**validated_data)
