@@ -5,5 +5,6 @@ from . import views
 
 urlpatterns = [
     path("users/", views.UserCreateView.as_view()),
-    # path("login/", jwt_views.TokenObtainPairView.as_view()),
+    path("login/", views.LoginJWTView.as_view()),
+    path("token/refresh/", jwt_views.TokenRefreshView.as_view()),
 ]
