@@ -3,6 +3,7 @@ from rest_framework.validators import UniqueValidator
 from django.core.validators import RegexValidator
 from .models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from carts.models import Cart
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -80,12 +81,12 @@ class UserSerializer(serializers.ModelSerializer):
         if is_superuser:
             validated_data["is_seller"] = False
             validated_data["is_client"] = False
-            return User.objects.create_superuser(**validated_data)
+            new_superuser = User.objects.create_superuser(**validated_data)
+            return new_superuser
 
-        if validated_data["is_seller"] is True:
-            return User.objects.create_user(**validated_data)
-
-        return User.objects.create_user(**validated_data)
+        new_user = User.objects.create_user(**validated_data)
+        new_cart = Cart.objects.create(user=new_user)
+        return new_user
 
 
 class CustomJWTSerializer(TokenObtainPairSerializer):
