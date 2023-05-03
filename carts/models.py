@@ -9,11 +9,11 @@ class Cart(models.Model):
     )
 
     products = models.ManyToManyField(
-        "products.Product", through="CarListProducts", related_name="carts"
+        "products.Product", through="CartListProducts", related_name="carts"
     )
 
 
-class CarListProducts(models.Model):
+class CartListProducts(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     quantity = models.IntegerField()
 
