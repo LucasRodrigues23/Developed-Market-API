@@ -198,7 +198,3 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     # OTHER SETTINGS
 }
-
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-

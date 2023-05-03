@@ -6,3 +6,4 @@ class ProductSellerPermission(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return (request.user.is_seller or request.user.is_superuser)
+    
