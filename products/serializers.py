@@ -12,9 +12,10 @@ class ProductSerializer(serializers.ModelSerializer):
             "quantity_stock",
             "is_available_for_sale",
             "brand",
-            "category"
+            "category",
+            "seller_id"
         ]
-        read_only_fields = ["id","created_at","updated_at"]
+        read_only_fields = ["id","created_at","updated_at","seller_id"]
     
     def create(self, validated_data):
         return Product.objects.create(**validated_data)

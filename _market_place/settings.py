@@ -58,6 +58,7 @@ MY_APPS = [
     "users",
     "addresses",
     "carts",
+    "products"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + MY_APPS
@@ -197,3 +198,7 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     # OTHER SETTINGS
 }
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
