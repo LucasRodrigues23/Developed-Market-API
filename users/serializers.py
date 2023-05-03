@@ -82,6 +82,7 @@ class UserSerializer(serializers.ModelSerializer):
             validated_data["is_seller"] = False
             validated_data["is_client"] = False
             new_superuser = User.objects.create_superuser(**validated_data)
+            new_cart = Cart.objects.create(user=new_superuser)
             return new_superuser
 
         new_user = User.objects.create_user(**validated_data)
