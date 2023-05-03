@@ -1,11 +1,11 @@
 from rest_framework.generics import CreateAPIView
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import CartListProducts
 from .serializers import CartListProductsSerializer
+from .permissions import IsCartOwner
 
 
 class CartListProductsView(CreateAPIView):
-    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsCartOwner]
     queryset = CartListProducts.objects.all()
     serializer_class = CartListProductsSerializer
 
