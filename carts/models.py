@@ -18,9 +18,11 @@ class CartListProducts(models.Model):
     cart = models.ForeignKey(
         "carts.Cart",
         on_delete=models.CASCADE,
+        related_name="cart_list"
     )
 
     product = models.ForeignKey(
         "products.Product",
         on_delete=models.PROTECT,
+        related_name="cart_list"
     )
