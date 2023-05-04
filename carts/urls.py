@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from purchase_orders.views import PurchaseOrderDetalView
 
 
 urlpatterns = [
@@ -10,5 +11,10 @@ urlpatterns = [
     path(
         "carts/<uuid:cart_id>/",
         views.CartRetrieve.as_view(),
+    ),
+    path(
+        "orders/carts/<uuid:cart_id>/",
+        PurchaseOrderDetalView.as_view(),
     )
+    
 ]

@@ -7,7 +7,6 @@ class Cart(models.Model):
     user = models.OneToOneField(
         "users.User", on_delete=models.CASCADE, related_name="cart"
     )
-
     products = models.ManyToManyField(
         "products.Product", through="CartListProducts", related_name="carts"
     )
@@ -16,7 +15,6 @@ class Cart(models.Model):
 class CartListProducts(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
     quantity = models.IntegerField()
-
     cart = models.ForeignKey(
         "carts.Cart",
         on_delete=models.CASCADE,
