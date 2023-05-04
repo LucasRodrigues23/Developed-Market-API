@@ -5,6 +5,19 @@ from .permissions import IsCartOwner
 from django.shortcuts import get_object_or_404
 
 
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+
+
+class CustomPaginationCartRetrieve(PageNumberPagination):
+    def get_paginated_response(self, data):
+        # Verifica se a rota atual é a que não deve usar paginação
+        if "/api/carts/" in self.request.path:
+            return Response(data[0])
+        # Se não for, usa a paginação padrão
+        return super().get_paginated_response(data)
+
+
 class CartListProductsView(CreateAPIView):
     permission_classes = [IsCartOwner]
     queryset = CartListProducts.objects.all()
@@ -19,6 +32,7 @@ class CartListProductsView(CreateAPIView):
 
 class CartRetrieve(ListAPIView):
     serializer_class = CartRetrieveSerializer
+    pagination_class = CustomPaginationCartRetrieve
 
     def get_queryset(self):
         cart_id = self.kwargs.get("cart_id")
