@@ -32,9 +32,50 @@ class CartListProductsSerializer(serializers.ModelSerializer):
             return CartListProducts.objects.create(**validated_data)
 
 
-class CartRetrieveSerializer(serializers.ModelSerializer):
+class ProductCartListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "name",
+            "description",
+            "price",
+            "brand",
+            "category",
+            "seller_id"
+        ]
+
+
+class CartListSerializer(serializers.ModelSerializer):
+
+    product = ProductCartListSerializer()
+    total_product = serializers.SerializerMethodField()
 
     class Meta:
-        model = Cart
-        fields = ["id", "user", "products"]
+        model = CartListProducts
+        fields = ["product", "quantity", "total_product"]
         read_only_fields = ["id"]
+        depth = 1
+
+    def get_total_product(self, validated_data):
+        return validated_data.quantity * validated_data.product.price
+
+
+class CartRetrieveSerializer(serializers.ModelSerializer):
+
+    cart_list = CartListSerializer(many=True)
+    total_value_cart = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Cart
+        fields = ["id", "total_value_cart", "cart_list"]
+        read_only_fields = ["id"]
+        depth = 2
+
+    def get_total_value_cart(self, validated_data):
+        list_products = CartListProducts.objects.filter(cart_id =validated_data.id).select_related("product")
+        total_value_cart = 0
+        for product in list_products:
+            total_value_cart += product.quantity * product.product.price
+        return total_value_cart
+       

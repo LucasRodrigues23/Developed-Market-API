@@ -11,11 +11,7 @@ from rest_framework.response import Response
 
 class CustomPaginationCartRetrieve(PageNumberPagination):
     def get_paginated_response(self, data):
-        # Verifica se a rota atual é a que não deve usar paginação
-        if "/api/carts/" in self.request.path:
-            return Response(data[0])
-        # Se não for, usa a paginação padrão
-        return super().get_paginated_response(data)
+        return Response(data[0])
 
 
 class CartListProductsView(CreateAPIView):
