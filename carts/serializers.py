@@ -13,7 +13,8 @@ class CartListProductsSerializer(serializers.ModelSerializer):
 
     def validate_product_id(self, value):
         if not Product.objects.filter(pk=value).exists():
-            raise serializers.ValidationError({"message": "product not found!"})
+            raise serializers.ValidationError(
+                {"message": "product not found!"})
         return value
 
     def create(self, validated_data: dict) -> CartListProducts:
@@ -29,3 +30,11 @@ class CartListProductsSerializer(serializers.ModelSerializer):
             return find_cart
         else:
             return CartListProducts.objects.create(**validated_data)
+
+
+class CartRetrieveSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Cart
+        fields = ["id", "user", "products"]
+        read_only_fields = ["id"]
