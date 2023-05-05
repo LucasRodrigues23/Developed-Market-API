@@ -2,7 +2,7 @@ from .models import Product
 from users.models import User
 from .serializers import ProductSerializer
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, UpdateAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .permissions import ProductSellerPermission
 from rest_framework.pagination import PageNumberPagination
@@ -41,3 +41,9 @@ class ProductView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         return serializer.save(seller=self.request.user)
+    
+class StockProductUpdateView(UpdateAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [ProductSellerPermission]
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
