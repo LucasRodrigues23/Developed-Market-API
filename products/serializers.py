@@ -27,7 +27,7 @@ class ProductSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         if validated_data["quantity_stock"] > 0:
             validated_data["is_available_for_sale"] = True
-
+            
         return Product.objects.create(**validated_data)
     
 
