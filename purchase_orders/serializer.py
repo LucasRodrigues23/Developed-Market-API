@@ -60,29 +60,48 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
                 {"message": "Sorry, your shopping cart is empty!"}
             )
 
-        seller_id_list = []
         for item in cart_list:
-            if item.product.seller not in seller_id_list:
-                seller_id_list.append(item.product.seller)
+            print(
+                item.product.price,
+                item.product.quantity_stock,
+                item.product.is_available_for_sale,
+            )
+            if item.product.is_available_for_sale is False:
+                raise serializers.ValidationError(
+                    {
+                        "message": f"Sorry, the product {item.product.name} is not available!"
+                    }
+                )
+            if item.quantity > item.product.quantity_stock:
+                raise serializers.ValidationError(
+                    {
+                        "message": f"Sorry, the product {item.product.name} is not available!"
+                    }
+                )
 
-        order_list = []
-        for seller in seller_id_list:
-            validated_data["seller"] = seller
-            price = 0
-            quantity = 0
-            for item in cart_list:
-                if item.product.seller == seller:
-                    price += item.quantity * item.product.price
-                    quantity += item.quantity
-            validated_data["quantity_items"] = quantity
-            validated_data["price"] = price
-            order = PurchaseOrders.objects.create(**validated_data)
-            order_list.append(order)
+        # seller_id_list = []
+        # for item in cart_list:
+        #     if item.product.seller not in seller_id_list:
+        #         seller_id_list.append(item.product.seller)
 
-        for item in cart_list:
-            for order in order_list:
-                if order.seller == item.product.seller:
-                    order.products.add(item.product)
+        # order_list = []
+        # for seller in seller_id_list:
+        #     validated_data["seller"] = seller
+        #     price = 0
+        #     quantity = 0
+        #     for item in cart_list:
+        #         if item.product.seller == seller:
+        #             price += item.quantity * item.product.price
+        #             quantity += item.quantity
+        #     validated_data["quantity_items"] = quantity
+        #     validated_data["price"] = price
+        #     order = PurchaseOrders.objects.create(**validated_data)
+        #     order_list.append(order)
 
-        cart_list.delete()
-        return order_list
+        # for item in cart_list:
+        #     for order in order_list:
+        #         if order.seller == item.product.seller:
+        #             order.products.add(item.product)
+
+        # cart_list.delete()
+        return "order_list"
