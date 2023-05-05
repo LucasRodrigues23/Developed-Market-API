@@ -29,6 +29,10 @@ class PurchaseOrderListClientView(ListAPIView):
     serializer_class = PurchaseOrdersListClientSerializer
 
     def get_queryset(self):
-        client_id = self.kwargs.get("client_id")
+        client_id = self.kwargs.get("user_id")
         order = get_object_or_404(User, pk=client_id)
+        if self.request.path.__contains__("seller"):
+            return PurchaseOrders.objects.filter(seller_id=client_id).order_by(
+                "updated_at"
+            )
         return PurchaseOrders.objects.filter(user_id=client_id).order_by("updated_at")
