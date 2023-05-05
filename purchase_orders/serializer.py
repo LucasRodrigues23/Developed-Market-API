@@ -28,21 +28,33 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
         ]
 
     def get_orders(self, validated_data):
+        list_orders = validated_data[0]
+        list_cart_products = validated_data[1]
+
         orders = []
-        for order in validated_data:
+        for order in list_orders:
             list_product_order = [product for product in order.products.values()]
+
             list_product_order_serializer = ProductCartSerializer(
                 data=list_product_order, many=True
             )
             list_product_order_serializer.is_valid(raise_exception=True)
+
+            for product in list_product_order_serializer.data:
+                for item in list_cart_products:
+                    if str(product["id"]) == str(item.product.id):
+                        product["quantity_product"] = item.quantity
+
             orders.append(
                 {
                     "id": order.id,
                     "status": order.status,
                     "price": order.price,
                     "quantity_items": order.quantity_items,
-                    "user_id": order.user.id,
+                    "client_id": order.user.id,
                     "seller_id": order.seller.id,
+                    "created_at": order.created_at,
+                    "updated_at": order.updated_at,
                     "products": list_product_order_serializer.data,
                 }
             )
@@ -59,6 +71,28 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"message": "Sorry, your shopping cart is empty!"}
             )
+
+        for item in cart_list:
+            if item.product.is_available_for_sale is False:
+                raise serializers.ValidationError(
+                    {
+                        "message": f"Sorry, the product {item.product.name} is not available!"
+                    }
+                )
+            if item.quantity > item.product.quantity_stock:
+                raise serializers.ValidationError(
+                    {
+                        "message": f"Sorry, the product {item.product.name} is not available!"
+                    }
+                )
+
+        for item in cart_list:
+            new_product_stock = item.product.quantity_stock - item.quantity
+            item.product.quantity_stock = new_product_stock
+
+            if new_product_stock == 0:
+                item.product.is_available_for_sale = False
+            item.product.save()
 
         seller_id_list = []
         for item in cart_list:
@@ -84,5 +118,5 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
                 if order.seller == item.product.seller:
                     order.products.add(item.product)
 
-        cart_list.delete()
-        return order_list
+        # cart_list.delete()
+        return [order_list, cart_list]
