@@ -34,6 +34,7 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
         orders = []
         for order in list_orders:
             list_product_order = [product for product in order.products.values()]
+
             list_product_order_serializer = ProductCartSerializer(
                 data=list_product_order, many=True
             )
@@ -50,7 +51,7 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
                     "status": order.status,
                     "price": order.price,
                     "quantity_items": order.quantity_items,
-                    "user_id": order.user.id,
+                    "client_id": order.user.id,
                     "seller_id": order.seller.id,
                     "created_at": order.created_at,
                     "updated_at": order.updated_at,
@@ -117,5 +118,5 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
                 if order.seller == item.product.seller:
                     order.products.add(item.product)
 
-        cart_list.delete()
+        # cart_list.delete()
         return [order_list, cart_list]

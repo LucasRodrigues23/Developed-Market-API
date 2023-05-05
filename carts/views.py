@@ -32,17 +32,6 @@ class CartListProductsView(CreateAPIView):
         )
 
 
-# class CartRetrieve(ListAPIView):
-#     permission_classes = [IsCartOwner]
-#     serializer_class = CartRetrieveSerializer
-#     pagination_class = CustomPaginationCartRetrieve
-
-#     def get_queryset(self):
-#         cart_id = self.kwargs.get("cart_id")
-#         cart = get_object_or_404(Cart, pk=cart_id)
-#         return Cart.objects.filter(pk=cart_id)
-
-
 class CartRetrieve(ListAPIView):
     permission_classes = [IsCartOwner]
     serializer_class = CartRetrieveSerializer
