@@ -36,5 +36,4 @@ class ProductSerializer(serializers.ModelSerializer):
             if key == "quantity_stock":
                 setattr(instance, key, value)
         instance.save()
-
         return instance
