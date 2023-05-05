@@ -7,4 +7,5 @@ from products import views as product_views
 urlpatterns = [
     path("products/", views.ProductView.as_view()),
     path("products/<int:pk>/", product_views.ProductView.as_view()),
+    path("products/<uuid:pk>/", product_views.StockProductUpdateView.as_view())
 ]

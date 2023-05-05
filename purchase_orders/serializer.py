@@ -118,5 +118,5 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
                 if order.seller == item.product.seller:
                     order.products.add(item.product)
 
-        # cart_list.delete()
+        cart_list.delete()
         return [order_list, cart_list]
