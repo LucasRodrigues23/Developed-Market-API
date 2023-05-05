@@ -1,29 +1,34 @@
-from django.shortcuts import render
 from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import PurchaseOrders
-from .serializer import PurchaseOrdersSerializer
-from rest_framework import status
-from rest_framework.response import Response
+from .serializer import (
+    PurchaseOrdersCreateSerializer,
+    PurchaseOrdersListClientSerializer,
+)
 from carts.models import Cart
+from users.models import User
 from django.shortcuts import get_object_or_404
+from carts.permissions import IsCartOwner
+from .permissions import IsOrdersOwner
 
 
-class PurchaseOrderDetalView(CreateAPIView):
+class PurchaseOrderCreateView(CreateAPIView):
     authentication_classes = [JWTAuthentication]
+    permission_classes = [IsCartOwner]
     queryset = PurchaseOrders
-    serializer_class = PurchaseOrdersSerializer
+    serializer_class = PurchaseOrdersCreateSerializer
 
     def perform_create(self, serializer):
         cart_exists = get_object_or_404(Cart, pk=self.kwargs.get("cart_id"))
         serializer.save(user=self.request.user, cart_id=self.kwargs.get("cart_id"))
 
 
-""" class PurchaseOrderView(ListAPIView):
+class PurchaseOrderListClientView(ListAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsOrderOwner]
+    permission_classes = [IsOrdersOwner]
+    serializer_class = PurchaseOrdersListClientSerializer
 
     def get_queryset(self):
-        order_id = self.kwargs.get("order_id")
-        order = get_object_or_404(PurchaseOrders, pk=order_id)
-        return PurchaseOrders.objects.filter(order_id=order_id).select_related("product") """
+        client_id = self.kwargs.get("client_id")
+        order = get_object_or_404(User, pk=client_id)
+        return PurchaseOrders.objects.filter(user_id=client_id).order_by("updated_at")
