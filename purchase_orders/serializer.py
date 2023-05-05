@@ -7,12 +7,12 @@ class ProductCartSerializer(serializers.Serializer):
     id = serializers.UUIDField()
     name = serializers.CharField()
     description = serializers.CharField()
-    price = serializers.FloatField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
     brand = serializers.CharField()
     seller_id = serializers.UUIDField()
 
 
-class PurchaseOrdersSerializer(serializers.ModelSerializer):
+class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
     orders = serializers.SerializerMethodField()
 
     class Meta:
@@ -118,5 +118,39 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
                 if order.seller == item.product.seller:
                     order.products.add(item.product)
 
-        # cart_list.delete()
+        cart_list.delete()
         return [order_list, cart_list]
+
+
+class PurchaseOrdersListClientSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PurchaseOrders
+        fields = [
+            "id",
+            "status",
+            "price",
+            "quantity_items",
+            "user_id",
+            "seller_id",
+            "created_at",
+            "updated_at",
+            "products",
+        ]
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "price",
+            "quantity_items",
+            "products",
+        ]
+
+    def get_products(self, validated_data):
+        list_product_order = [product for product in validated_data.products.values()]
+        list_product_order_serializer = ProductCartSerializer(
+            data=list_product_order, many=True
+        )
+        list_product_order_serializer.is_valid(raise_exception=True)
+        return list_product_order_serializer.data
