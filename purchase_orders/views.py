@@ -9,6 +9,7 @@ from carts.models import Cart
 from users.models import User
 from django.shortcuts import get_object_or_404
 from carts.permissions import IsCartOwner
+from .permissions import IsOrdersOwner
 
 
 class PurchaseOrderCreateView(CreateAPIView):
@@ -24,8 +25,8 @@ class PurchaseOrderCreateView(CreateAPIView):
 
 class PurchaseOrderListClientView(ListAPIView):
     authentication_classes = [JWTAuthentication]
+    permission_classes = [IsOrdersOwner]
     serializer_class = PurchaseOrdersListClientSerializer
-    # permission_classes = [IsOrderOwner]
 
     def get_queryset(self):
         client_id = self.kwargs.get("client_id")
