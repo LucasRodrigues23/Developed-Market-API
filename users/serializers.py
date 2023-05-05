@@ -89,6 +89,19 @@ class UserSerializer(serializers.ModelSerializer):
         new_cart = Cart.objects.create(user=new_user)
         return new_user
 
+    def update(self, instance: User, validated_data: dict) -> User:
+        ignore_keys = ["password", "username", "cpf", "is_superuser"]
+        for key, value in validated_data.items():
+            if not ignore_keys.__contains__(key):
+                setattr(instance, key, value)
+
+        if validated_data.get("password"):
+            instance.set_password(validated_data["password"])
+
+        instance.save()
+
+        return instance
+
 
 class CustomJWTSerializer(TokenObtainPairSerializer):
     @classmethod
