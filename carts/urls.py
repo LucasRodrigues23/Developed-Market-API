@@ -13,8 +13,7 @@ urlpatterns = [
         views.CartRetrieve.as_view(),
     ),
     path(
-        "orders/carts/<uuid:cart_id>/",
+        "carts/<uuid:cart_id>/orders/",
         PurchaseOrderDetalView.as_view(),
-    )
-    
+    ),
 ]

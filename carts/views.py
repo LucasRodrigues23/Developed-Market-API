@@ -15,7 +15,9 @@ class CustomPaginationCartRetrieve(PageNumberPagination):
         total_value_cart = 0
         for product in data:
             total_value_cart += product["total_product"]
-        return Response({"id": cart_id, "total_value_cart": total_value_cart, "cart_list": data})
+        return Response(
+            {"id": cart_id, "total_value_cart": total_value_cart, "cart_list": data}
+        )
 
 
 class CartListProductsView(CreateAPIView):
@@ -40,6 +42,7 @@ class CartListProductsView(CreateAPIView):
 #         cart = get_object_or_404(Cart, pk=cart_id)
 #         return Cart.objects.filter(pk=cart_id)
 
+
 class CartRetrieve(ListAPIView):
     permission_classes = [IsCartOwner]
     serializer_class = CartRetrieveSerializer
@@ -48,4 +51,6 @@ class CartRetrieve(ListAPIView):
     def get_queryset(self):
         cart_id = self.kwargs.get("cart_id")
         cart = get_object_or_404(Cart, pk=cart_id)
-        return CartListProducts.objects.filter(cart_id=cart_id).select_related("product")
+        return CartListProducts.objects.filter(cart_id=cart_id).select_related(
+            "product"
+        )
