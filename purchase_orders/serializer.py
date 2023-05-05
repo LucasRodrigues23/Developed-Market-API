@@ -65,6 +65,7 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
                 item.product.price,
                 item.product.quantity_stock,
                 item.product.is_available_for_sale,
+                item.quantity > item.product.quantity_stock,
             )
             if item.product.is_available_for_sale is False:
                 raise serializers.ValidationError(
@@ -79,29 +80,29 @@ class PurchaseOrdersSerializer(serializers.ModelSerializer):
                     }
                 )
 
-        # seller_id_list = []
-        # for item in cart_list:
-        #     if item.product.seller not in seller_id_list:
-        #         seller_id_list.append(item.product.seller)
+        seller_id_list = []
+        for item in cart_list:
+            if item.product.seller not in seller_id_list:
+                seller_id_list.append(item.product.seller)
 
-        # order_list = []
-        # for seller in seller_id_list:
-        #     validated_data["seller"] = seller
-        #     price = 0
-        #     quantity = 0
-        #     for item in cart_list:
-        #         if item.product.seller == seller:
-        #             price += item.quantity * item.product.price
-        #             quantity += item.quantity
-        #     validated_data["quantity_items"] = quantity
-        #     validated_data["price"] = price
-        #     order = PurchaseOrders.objects.create(**validated_data)
-        #     order_list.append(order)
+        order_list = []
+        for seller in seller_id_list:
+            validated_data["seller"] = seller
+            price = 0
+            quantity = 0
+            for item in cart_list:
+                if item.product.seller == seller:
+                    price += item.quantity * item.product.price
+                    quantity += item.quantity
+            validated_data["quantity_items"] = quantity
+            validated_data["price"] = price
+            order = PurchaseOrders.objects.create(**validated_data)
+            order_list.append(order)
 
-        # for item in cart_list:
-        #     for order in order_list:
-        #         if order.seller == item.product.seller:
-        #             order.products.add(item.product)
+        for item in cart_list:
+            for order in order_list:
+                if order.seller == item.product.seller:
+                    order.products.add(item.product)
 
-        # cart_list.delete()
-        return "order_list"
+        cart_list.delete()
+        return order_list
