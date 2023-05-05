@@ -27,7 +27,21 @@ class PurchaseOrders(models.Model):
         on_delete=models.PROTECT,
         related_name="purchase_orders_seller",
     )
+
     products = models.ManyToManyField(
-        "products.Product",
-        related_name="purchase_orders"
+        "products.Product", through="OrderItems", related_name="purchase_orders"
+    )
+
+
+class OrderItems(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True, editable=False)
+    quantity = models.IntegerField()
+    purchase_order = models.ForeignKey(
+        "purchase_orders.PurchaseOrders",
+        on_delete=models.CASCADE,
+        related_name="order_items",
+    )
+
+    product = models.ForeignKey(
+        "products.Product", on_delete=models.PROTECT, related_name="order_items"
     )

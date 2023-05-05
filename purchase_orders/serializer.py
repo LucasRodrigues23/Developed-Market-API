@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from carts.models import CartListProducts
-from .models import PurchaseOrders
+from .models import PurchaseOrders, OrderItems
 
 
 class ProductCartSerializer(serializers.Serializer):
@@ -116,10 +116,24 @@ class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
         for item in cart_list:
             for order in order_list:
                 if order.seller == item.product.seller:
-                    order.products.add(item.product)
+                    OrderItems.objects.create(
+                        quantity=item.quantity,
+                        purchase_order=order,
+                        product=item.product,
+                    )
 
         cart_list.delete()
         return [order_list, cart_list]
+
+
+class ProductOrderListSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+    description = serializers.CharField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    brand = serializers.CharField()
+    seller_id = serializers.UUIDField()
+    product_quantity = serializers.IntegerField()
 
 
 class PurchaseOrdersListClientSerializer(serializers.ModelSerializer):
@@ -148,9 +162,23 @@ class PurchaseOrdersListClientSerializer(serializers.ModelSerializer):
         ]
 
     def get_products(self, validated_data):
-        list_product_order = [product for product in validated_data.products.values()]
-        list_product_order_serializer = ProductCartSerializer(
-            data=list_product_order, many=True
+        order_id = validated_data.id
+
+        queryset_order_items = OrderItems.objects.filter(
+            purchase_order=order_id
+        ).select_related("product")
+
+        list_order_items = [order_items for order_items in queryset_order_items]
+
+        list_products = []
+        for item in list_order_items:
+            product_order = item.product.__dict__
+            product_order["product_quantity"] = item.quantity
+            list_products.append(product_order)
+
+        list_products_serializer = ProductOrderListSerializer(
+            data=list_products, many=True
         )
-        list_product_order_serializer.is_valid(raise_exception=True)
-        return list_product_order_serializer.data
+        list_products_serializer.is_valid(raise_exception=True)
+
+        return list_products_serializer.data
