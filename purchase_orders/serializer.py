@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from carts.models import CartListProducts
 from .models import PurchaseOrders, OrderItems
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 class ProductCartSerializer(serializers.Serializer):
@@ -112,7 +114,13 @@ class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
             validated_data["price"] = price
             order = PurchaseOrders.objects.create(**validated_data)
             order_list.append(order)
-
+            send_mail(
+                subject=f"Pedido {order.id}",
+                message=f"Pedido realizado com sucesso",
+                from_email=settings.EMAIL_HOST,
+                recipient_list=[order.user.email],
+                fail_silently=False,
+            )
         for item in cart_list:
             for order in order_list:
                 if order.seller == item.product.seller:
@@ -124,6 +132,15 @@ class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
 
         cart_list.delete()
         return [order_list, cart_list]
+
+    """def update(self, instance: PurchaseOrders, validated_data: dict) -> PurchaseOrders:
+        for key, value in validated_data.items():
+            if key == "status" and value != "Entregue":
+                setattr(instance, key, value)
+
+        instance.save()
+
+        return instance"""
 
 
 class ProductOrderListSerializer(serializers.Serializer):
@@ -182,3 +199,48 @@ class PurchaseOrdersListClientSerializer(serializers.ModelSerializer):
         list_products_serializer.is_valid(raise_exception=True)
 
         return list_products_serializer.data
+
+
+class PurchaseOrdersUpdateSerializer(serializers.ModelSerializer):
+    def update(self, instance: PurchaseOrders, validated_data: dict) -> PurchaseOrders:
+        for key, value in validated_data.items():
+            if key == "status":
+                if instance.status == "Entregue":
+                    raise serializers.ValidationError(
+                        {"menssage": "the purchase order is already completed"}
+                    )
+                if instance.status == "Pedido Realizado" and value != "Entregue":
+                    raise serializers.ValidationError(
+                        {"menssage": "the purchase order is already acoomplished"}
+                    )
+
+                if instance.status == value:
+                    raise serializers.ValidationError(
+                        {"menssage": "the purchase order is already this status"}
+                    )
+                setattr(instance, key, value)
+
+        instance.save()
+
+        send_mail(
+            subject=f"Pedido {instance.id}",
+            message=f"O Status do seu pedido foi alterado para {instance.status}",
+            from_email=settings.EMAIL_HOST,
+            recipient_list=[instance.user.email],
+            fail_silently=False,
+        )
+
+        return instance
+
+    class Meta:
+        model = PurchaseOrders
+        fields = [
+            "id",
+            "status",
+            "price",
+            "quantity_items",
+            "user_id",
+            "seller_id",
+            "created_at",
+            "updated_at",
+        ]
