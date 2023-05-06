@@ -10,7 +10,7 @@ class ProductCartSerializer(serializers.Serializer):
     name = serializers.CharField()
     description = serializers.CharField()
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    brand = serializers.CharField()
+    brand = serializers.CharField(allow_null=True)
     seller_id = serializers.UUIDField()
 
 
@@ -148,7 +148,7 @@ class ProductOrderListSerializer(serializers.Serializer):
     name = serializers.CharField()
     description = serializers.CharField()
     price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    brand = serializers.CharField()
+    brand = serializers.CharField(allow_null=True)
     seller_id = serializers.UUIDField()
     product_quantity = serializers.IntegerField()
 
