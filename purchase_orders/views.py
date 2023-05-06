@@ -10,7 +10,7 @@ from carts.models import Cart
 from users.models import User
 from django.shortcuts import get_object_or_404
 from carts.permissions import IsCartOwner
-from .permissions import IsOrdersOwner, IsProductOwner
+from .permissions import IsOrdersOwner, IsOrderProductOwner
 
 
 class PurchaseOrderCreateView(CreateAPIView):
@@ -42,4 +42,4 @@ class PurchaseOrderListClientView(ListAPIView):
 class PurchaseOrderDetailView(RetrieveUpdateAPIView):
     queryset = PurchaseOrders.objects.all()
     serializer_class = PurchaseOrdersUpdateSerializer
-    # permission_classes = [IsProductOwner]
+    permission_classes = [IsOrderProductOwner]
