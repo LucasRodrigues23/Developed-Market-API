@@ -1,15 +1,16 @@
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .models import PurchaseOrders
 from .serializer import (
     PurchaseOrdersCreateSerializer,
     PurchaseOrdersListClientSerializer,
+    PurchaseOrdersUpdateSerializer,
 )
 from carts.models import Cart
 from users.models import User
 from django.shortcuts import get_object_or_404
 from carts.permissions import IsCartOwner
-from .permissions import IsOrdersOwner
+from .permissions import IsOrdersOwner, IsProductOwner
 
 
 class PurchaseOrderCreateView(CreateAPIView):
@@ -36,3 +37,9 @@ class PurchaseOrderListClientView(ListAPIView):
                 "updated_at"
             )
         return PurchaseOrders.objects.filter(user_id=client_id).order_by("updated_at")
+
+
+class PurchaseOrderDetailView(RetrieveUpdateAPIView):
+    queryset = PurchaseOrders.objects.all()
+    serializer_class = PurchaseOrdersUpdateSerializer
+    # permission_classes = [IsProductOwner]

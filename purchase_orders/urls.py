@@ -11,4 +11,12 @@ urlpatterns = [
         "orders/seller/<uuid:user_id>/",
         views.PurchaseOrderListClientView.as_view(),
     ),
+    path(
+        "orders/seller/<uuid:purchase_order_id>/",
+        views.PurchaseOrderListClientView.as_view(),
+    ),
+    path(
+        "orders/<uuid:pk>/seller/",
+        views.PurchaseOrderDetailView.as_view(),
+    ),
 ]

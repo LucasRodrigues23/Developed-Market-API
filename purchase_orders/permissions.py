@@ -9,3 +9,14 @@ class IsOrdersOwner(permissions.BasePermission):
             return True
         user_id = request.path.split("/")[4]
         return str(user_id) == str(request.user.id)
+
+
+class IsProductOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view: View, obj: User) -> bool:
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        print(request.user)
+        return (
+            request.user.is_authenticated
+            and request.user.is_seller
+            or request.user.is_superuser
+        )

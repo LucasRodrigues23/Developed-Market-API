@@ -125,6 +125,15 @@ class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
         cart_list.delete()
         return [order_list, cart_list]
 
+    """def update(self, instance: PurchaseOrders, validated_data: dict) -> PurchaseOrders:
+        for key, value in validated_data.items():
+            if key == "status" and value != "Entregue":
+                setattr(instance, key, value)
+
+        instance.save()
+
+        return instance"""
+
 
 class ProductOrderListSerializer(serializers.Serializer):
     id = serializers.UUIDField()
@@ -182,3 +191,24 @@ class PurchaseOrdersListClientSerializer(serializers.ModelSerializer):
         list_products_serializer.is_valid(raise_exception=True)
 
         return list_products_serializer.data
+
+
+class PurchaseOrdersUpdateSerializer(serializers.ModelSerializer):
+    def update(self, instance: PurchaseOrders, validated_data: dict) -> PurchaseOrders:
+        print(instance.status)
+        for key, value in validated_data.items():
+            if key == "status" and value != instance.status:
+                if instance.status == "Entregue":
+                    raise serializers.ValidationError(
+                        {"menssage": "the purchase order is already completed"}
+                    )
+
+                setattr(instance, key, value)
+
+        instance.save()
+
+        return instance
+
+    class Meta:
+        model = PurchaseOrders
+        fields = ["status"]
