@@ -47,6 +47,8 @@ class UserSerializer(serializers.ModelSerializer):
         ],
     )
 
+    cart_id = serializers.SerializerMethodField()
+
     class Meta:
         model = User
 
@@ -65,15 +67,15 @@ class UserSerializer(serializers.ModelSerializer):
             "is_client",
             "created_at",
             "updated_at",
+            "cart_id",
         ]
-        read_only_fields = [
-            "id",
-            "created_at",
-            "updated_at",
-        ]
+        read_only_fields = ["id", "created_at", "updated_at", "cart_id"]
         extra_kwargs = {
             "password": {"write_only": True},
         }
+
+    def get_cart_id(self, validated_data):
+        return validated_data.cart.id
 
     def create(self, validated_data: dict) -> User:
         is_superuser = validated_data.pop("is_superuser", None)
