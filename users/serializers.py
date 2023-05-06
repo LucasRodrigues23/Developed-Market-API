@@ -3,6 +3,7 @@ from rest_framework.validators import UniqueValidator
 from django.core.validators import RegexValidator
 from .models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from carts.models import Cart
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -46,6 +47,8 @@ class UserSerializer(serializers.ModelSerializer):
         ],
     )
 
+    cart_id = serializers.SerializerMethodField()
+
     class Meta:
         model = User
 
@@ -64,15 +67,15 @@ class UserSerializer(serializers.ModelSerializer):
             "is_client",
             "created_at",
             "updated_at",
+            "cart_id",
         ]
-        read_only_fields = [
-            "id",
-            "created_at",
-            "updated_at",
-        ]
+        read_only_fields = ["id", "created_at", "updated_at", "cart_id"]
         extra_kwargs = {
             "password": {"write_only": True},
         }
+
+    def get_cart_id(self, validated_data):
+        return validated_data.cart.id
 
     def create(self, validated_data: dict) -> User:
         is_superuser = validated_data.pop("is_superuser", None)
@@ -80,12 +83,26 @@ class UserSerializer(serializers.ModelSerializer):
         if is_superuser:
             validated_data["is_seller"] = False
             validated_data["is_client"] = False
-            return User.objects.create_superuser(**validated_data)
+            new_superuser = User.objects.create_superuser(**validated_data)
+            new_cart = Cart.objects.create(user=new_superuser)
+            return new_superuser
 
-        if validated_data["is_seller"] is True:
-            return User.objects.create_user(**validated_data)
+        new_user = User.objects.create_user(**validated_data)
+        new_cart = Cart.objects.create(user=new_user)
+        return new_user
 
-        return User.objects.create_user(**validated_data)
+    def update(self, instance: User, validated_data: dict) -> User:
+        ignore_keys = ["password", "username", "cpf", "is_superuser"]
+        for key, value in validated_data.items():
+            if not ignore_keys.__contains__(key):
+                setattr(instance, key, value)
+
+        if validated_data.get("password"):
+            instance.set_password(validated_data["password"])
+
+        instance.save()
+
+        return instance
 
 
 class CustomJWTSerializer(TokenObtainPairSerializer):

@@ -4,6 +4,99 @@ info:
   version: 1.0.0
   description: Entrega em grupo sprint 7-8
 paths:
+  /api/carts/{cart_id}/:
+    get:
+      operationId: api_carts_list
+      parameters:
+      - in: path
+        name: cart_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCartRetrieveList'
+          description: ''
+  /api/carts/{cart_id}/orders/:
+    post:
+      operationId: api_carts_orders_create
+      parameters:
+      - in: path
+        name: cart_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrders'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrders'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrders'
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrders'
+          description: ''
+  /api/carts/{cart_id}/products/:
+    post:
+      operationId: api_carts_products_create
+      parameters:
+      - in: path
+        name: cart_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartListProducts'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CartListProducts'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CartListProducts'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartListProducts'
+          description: ''
   /api/login/:
     post:
       operationId: api_login_create
@@ -30,6 +123,109 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomJWT'
+          description: ''
+  /api/products/:
+    get:
+      operationId: api_products_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductList'
+          description: ''
+    post:
+      operationId: api_products_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/products/{id}/:
+    get:
+      operationId: api_products_list_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductList'
+          description: ''
+    post:
+      operationId: api_products_create_2
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
           description: ''
   /api/token/refresh/:
     post:
@@ -164,6 +360,77 @@ components:
       - street
       - updated_at
       - user_id
+    CartListProducts:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        cart_id:
+          type: string
+          format: uuid
+          readOnly: true
+        product_id:
+          type: string
+          format: uuid
+      required:
+      - cart_id
+      - id
+      - product_id
+      - quantity
+    CartRetrieve:
+      type: object
+      properties:
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        total_product:
+          type: string
+          readOnly: true
+        product:
+          $ref: '#/components/schemas/ProductCartList'
+      required:
+      - product
+      - quantity
+      - total_product
+    CategoryEnum:
+      enum:
+      - Eletronics
+      - Clothing
+      - Shoes
+      - Toys
+      - Sports
+      - Health
+      - School
+      - Books
+      - Crafts
+      - Home
+      - Beauty
+      - Garden
+      - Grocery
+      - Others
+      type: string
+      description: |-
+        * `Eletronics` - Eletronics
+        * `Clothing` - Clothing
+        * `Shoes` - Shoes
+        * `Toys` - Toys
+        * `Sports` - Sports
+        * `Health` - Health
+        * `School` - School
+        * `Books` - Books
+        * `Crafts` - Crafts
+        * `Home` - Home
+        * `Beauty` - Beauty
+        * `Garden` - Garden
+        * `Grocery` - Grocery
+        * `Others` - Others
     CustomJWT:
       type: object
       properties:
@@ -175,6 +442,152 @@ components:
       required:
       - password
       - username
+    PaginatedCartRetrieveList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartRetrieve'
+    PaginatedProductList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        quantity_stock:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        is_available_for_sale:
+          type: string
+          readOnly: true
+        brand:
+          type: string
+          nullable: true
+          maxLength: 50
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        seller_id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+      - id
+      - is_available_for_sale
+      - name
+      - price
+      - quantity_stock
+      - seller_id
+    ProductCartList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        brand:
+          type: string
+          nullable: true
+          maxLength: 50
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        seller_id:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+      - id
+      - name
+      - price
+      - seller_id
+    PurchaseOrders:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        quantity_items:
+          type: integer
+          readOnly: true
+        user_id:
+          type: string
+          format: uuid
+          readOnly: true
+        seller_id:
+          type: string
+          format: uuid
+          readOnly: true
+        orders:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - orders
+      - price
+      - quantity_items
+      - seller_id
+      - user_id
     TokenRefresh:
       type: object
       properties:
