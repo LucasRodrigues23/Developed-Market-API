@@ -6,10 +6,10 @@ from .models import PurchaseOrders
 
 class IsOrdersOwner(permissions.BasePermission):
     def has_permission(self, request, view: View) -> bool:
-        if request.user.is_superuser:
+        if request.user.is_authenticated and request.user.is_superuser:
             return True
         user_id = request.path.split("/")[4]
-        return str(user_id) == str(request.user.id)
+        return request.user.is_authenticated and (str(user_id) == str(request.user.id))
 
 
 class IsOrderProductOwner(permissions.BasePermission):
