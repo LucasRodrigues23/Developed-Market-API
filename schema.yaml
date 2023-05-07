@@ -62,6 +62,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PurchaseOrdersCreate'
+              examples:
+                ExemploAnimalSerializer:
+                  value:
+                    orders:
+                    - id: f9cb24c1-0ef5-472e-adad-082b27248908
+                      status: Em Andamento
+                      price: 1700.0
+                      quantity_items: 2
+                      client_id: 53823c8d-c5cc-4311-a4dc-0586e930ae5a
+                      seller_id: 797c2e48-b070-42ca-ad95-c686b84a44c8
+                      created_at: '2023-05-06T14:52:42.775926Z'
+                      updated_at: '2023-05-06T14:52:42.775948Z'
+                      products:
+                      - id: 57d1fe59-c647-483c-85c1-8d8162e6ddff
+                        name: Produto Ruim
+                        description: testestestestestes
+                        price: '850.00'
+                        brand: Marca Ruim
+                        seller_id: 797c2e48-b070-42ca-ad95-c686b84a44c8
+                    - id: 2fcf2d63-a33a-4b41-90fc-88e4906150e8
+                      status: Em Andamento
+                      price: 198.0
+                      quantity_items: 2
+                      client_id: 53823c8d-c5cc-4311-a4dc-0586e930ae5a
+                      seller_id: 50e4b827-bb03-416c-9b92-890273403d9a
+                      created_at: '2023-05-06T14:52:43.731255Z'
+                      updated_at: '2023-05-06T14:52:43.731282Z'
+                      products:
+                      - id: 64f3f929-1416-4f06-ac24-259126d8e794
+                        name: Shorts Jeans
+                        description: Summer-essential cutoffs
+                        price: '99.00'
+                        brand: Denim
+                        seller_id: 50e4b827-bb03-416c-9b92-890273403d9a
+                  summary: Criação de animais
+                  description: Rota para criação de animais
           description: ''
   /api/carts/{cart_id}/products/:
     post:
@@ -166,7 +202,6 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PurchaseOrdersUpdate'
-        required: true
       security:
       - jwtAuth: []
       responses:
@@ -427,6 +462,7 @@ paths:
   /api/users/{id}/:
     get:
       operationId: api_users_retrieve
+      description: testando a descrição por rota GET
       parameters:
       - in: path
         name: id
@@ -447,6 +483,7 @@ paths:
           description: ''
     put:
       operationId: api_users_update
+      description: testando a descrição por rota PUT
       parameters:
       - in: path
         name: id
@@ -479,6 +516,7 @@ paths:
           description: ''
     patch:
       operationId: api_users_partial_update
+      description: testando a descrição por rota PATCH
       parameters:
       - in: path
         name: id
@@ -508,22 +546,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
-    delete:
-      operationId: api_users_destroy
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - api
-      security:
-      - jwtAuth: []
-      responses:
-        '204':
-          description: No response body
   /api/users/address/:
     post:
       operationId: api_users_address_create
@@ -635,7 +657,8 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         total_product:
-          type: string
+          type: number
+          format: float
           readOnly: true
         product:
           $ref: '#/components/schemas/ProductCartList'
@@ -793,10 +816,10 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
         quantity_items:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
         user_id:
           type: string
           format: uuid
@@ -869,6 +892,7 @@ components:
           readOnly: true
         cart_id:
           type: string
+          format: uuid
           readOnly: true
     Product:
       type: object
@@ -943,6 +967,36 @@ components:
       - name
       - price
       - seller_id
+    ProductOrderList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        brand:
+          type: string
+          nullable: true
+        seller_id:
+          type: string
+          format: uuid
+        product_quantity:
+          type: integer
+      required:
+      - brand
+      - description
+      - id
+      - name
+      - price
+      - product_quantity
+      - seller_id
     PurchaseOrdersCreate:
       type: object
       properties:
@@ -967,7 +1021,8 @@ components:
           format: uuid
           readOnly: true
         orders:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/PurchaseOrdersListClient'
           readOnly: true
       required:
       - id
@@ -1010,7 +1065,8 @@ components:
           format: date-time
           readOnly: true
         products:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/ProductOrderList'
           readOnly: true
       required:
       - created_at
@@ -1034,10 +1090,10 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
         quantity_items:
           type: integer
-          maximum: 2147483647
-          minimum: -2147483648
+          readOnly: true
         user_id:
           type: string
           format: uuid
@@ -1058,6 +1114,7 @@ components:
       - created_at
       - id
       - price
+      - quantity_items
       - seller_id
       - updated_at
       - user_id
@@ -1139,6 +1196,7 @@ components:
           readOnly: true
         cart_id:
           type: string
+          format: uuid
           readOnly: true
       required:
       - cart_id

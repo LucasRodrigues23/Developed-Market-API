@@ -40,6 +40,6 @@ class PurchaseOrderListClientView(ListAPIView):
 
 
 class PurchaseOrderDetailView(RetrieveUpdateAPIView):
+    permission_classes = [IsOrderProductOwner]
     queryset = PurchaseOrders.objects.all()
     serializer_class = PurchaseOrdersUpdateSerializer
-    permission_classes = [IsOrderProductOwner]

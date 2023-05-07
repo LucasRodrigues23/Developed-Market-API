@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from .models import CartListProducts, Cart
 from products.models import Product
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 
 
 class CartListProductsSerializer(serializers.ModelSerializer):
@@ -55,5 +57,6 @@ class CartRetrieveSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
         depth = 1
 
+    @extend_schema_field(OpenApiTypes.FLOAT)
     def get_total_product(self, validated_data):
         return validated_data.quantity * validated_data.product.price
