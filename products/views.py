@@ -1,17 +1,20 @@
 from .models import Product
-from users.models import User
 from .serializers import ProductSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListCreateAPIView, UpdateAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .permissions import ProductSellerPermission
 from rest_framework.pagination import PageNumberPagination
+from drf_spectacular.utils import extend_schema
 
 
 class CustomPaginationProduct(PageNumberPagination):
     page_size = 20
 
 
+@extend_schema(
+    tags=["Products"],
+)
 class ProductView(ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [ProductSellerPermission]
@@ -42,6 +45,9 @@ class ProductView(ListCreateAPIView):
         return serializer.save(seller=self.request.user)
 
 
+@extend_schema(
+    tags=["Products"],
+)
 class StockProductUpdateView(UpdateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [ProductSellerPermission]

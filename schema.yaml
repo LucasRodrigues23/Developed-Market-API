@@ -21,7 +21,7 @@ paths:
         schema:
           type: integer
       tags:
-      - api
+      - Carts
       security:
       - jwtAuth: []
       responses:
@@ -30,6 +30,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedCartRetrieveList'
+              examples:
+                ExampleListCart:
+                  value:
+                    count: 123
+                    next: http://api.example.org/accounts/?page=4
+                    previous: http://api.example.org/accounts/?page=2
+                    results:
+                    - id: fbf8e423-e82a-4f44-a82d-493873ce6a63
+                      total_value_cart: 159.9
+                      cart_list:
+                      - quantity: 2
+                        total_product: 24.36
+                        product:
+                          id: b7f3f2ec-0c9b-4200-b650-6c02775845db
+                          name: teste2
+                          description: testestestestestes
+                          price: '12.18'
+                          brand: teste
+                          category: Others
+                          seller_id: 513a656c-9f96-4847-9cb1-5aa3ff534996
+                      - quantity: 3
+                        total_product: 135.54
+                        product:
+                          id: a359a2dd-2c80-44a8-9921-1361032d794d
+                          name: teste3
+                          description: testestestestestes
+                          price: '45.18'
+                          brand: teste
+                          category: Others
+                          seller_id: 513a656c-9f96-4847-9cb1-5aa3ff534996
+                  summary: List Cart
           description: ''
   /api/carts/{cart_id}/orders/:
     post:
@@ -42,7 +73,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Carts
       requestBody:
         content:
           application/json:
@@ -63,7 +94,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PurchaseOrdersCreate'
               examples:
-                ExemploAnimalSerializer:
+                ExampleCreateOrder:
                   value:
                     orders:
                     - id: f9cb24c1-0ef5-472e-adad-082b27248908
@@ -96,8 +127,7 @@ paths:
                         price: '99.00'
                         brand: Denim
                         seller_id: 50e4b827-bb03-416c-9b92-890273403d9a
-                  summary: Criação de animais
-                  description: Rota para criação de animais
+                  summary: Create Order
           description: ''
   /api/carts/{cart_id}/products/:
     post:
@@ -110,7 +140,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Carts
       requestBody:
         content:
           application/json:
@@ -139,7 +169,7 @@ paths:
         Takes a set of user credentials and returns an access and refresh JSON web
         token pair to prove the authentication of those credentials.
       tags:
-      - api
+      - Autenticação
       requestBody:
         content:
           application/json:
@@ -170,7 +200,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Orders
       security:
       - jwtAuth: []
       responses:
@@ -190,7 +220,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Orders
       requestBody:
         content:
           application/json:
@@ -221,7 +251,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Orders
       requestBody:
         content:
           application/json:
@@ -259,7 +289,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Orders
       security:
       - jwtAuth: []
       responses:
@@ -286,7 +316,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Orders
       security:
       - jwtAuth: []
       responses:
@@ -307,7 +337,7 @@ paths:
         schema:
           type: integer
       tags:
-      - api
+      - Products
       security:
       - jwtAuth: []
       responses:
@@ -320,7 +350,7 @@ paths:
     post:
       operationId: api_products_create
       tags:
-      - api
+      - Products
       requestBody:
         content:
           application/json:
@@ -353,7 +383,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Products
       requestBody:
         content:
           application/json:
@@ -385,7 +415,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Products
       requestBody:
         content:
           application/json:
@@ -413,7 +443,7 @@ paths:
         Takes a refresh type JSON web token and returns an access type JSON web
         token if the refresh token is valid.
       tags:
-      - api
+      - Autenticação
       requestBody:
         content:
           application/json:
@@ -437,7 +467,11 @@ paths:
     post:
       operationId: api_users_create
       tags:
-      - api
+      - Users
+      - Autenticação
+      - Products
+      - Carts
+      - Orders
       requestBody:
         content:
           application/json:
@@ -452,6 +486,7 @@ paths:
         required: true
       security:
       - jwtAuth: []
+      - {}
       responses:
         '201':
           content:
@@ -471,7 +506,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Users
       security:
       - jwtAuth: []
       responses:
@@ -492,7 +527,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Users
       requestBody:
         content:
           application/json:
@@ -525,7 +560,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Users
       requestBody:
         content:
           application/json:
@@ -550,7 +585,7 @@ paths:
     post:
       operationId: api_users_address_create
       tags:
-      - api
+      - Users
       requestBody:
         content:
           application/json:

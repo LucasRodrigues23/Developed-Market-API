@@ -83,9 +83,9 @@ class PurchaseOrdersListClientSerializer(serializers.ModelSerializer):
     # exclude_fields=("sex",),
     examples=[
         OpenApiExample(
-            "Exemplo Animal Serializer",
-            summary="Criação de animais",
-            description="Rota para criação de animais",
+            "Example create order",
+            summary="Create Order",
+            # description="Rota para criação de animais",
             value={
                 "orders": [
                     {

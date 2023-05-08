@@ -11,8 +11,12 @@ from users.models import User
 from django.shortcuts import get_object_or_404
 from carts.permissions import IsCartOwner
 from .permissions import IsOrdersOwner, IsOrderProductOwner
+from drf_spectacular.utils import extend_schema
 
 
+@extend_schema(
+    tags=["Carts"],
+)
 class PurchaseOrderCreateView(CreateAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsCartOwner]
@@ -24,6 +28,9 @@ class PurchaseOrderCreateView(CreateAPIView):
         serializer.save(user=self.request.user, cart_id=self.kwargs.get("cart_id"))
 
 
+@extend_schema(
+    tags=["Orders"],
+)
 class PurchaseOrderListClientView(ListAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsOrdersOwner]
@@ -39,6 +46,9 @@ class PurchaseOrderListClientView(ListAPIView):
         return PurchaseOrders.objects.filter(user_id=client_id).order_by("updated_at")
 
 
+@extend_schema(
+    tags=["Orders"],
+)
 class PurchaseOrderDetailView(RetrieveUpdateAPIView):
     permission_classes = [IsOrderProductOwner]
     queryset = PurchaseOrders.objects.all()

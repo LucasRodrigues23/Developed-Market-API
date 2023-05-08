@@ -43,7 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[
             RegexValidator(
                 regex=r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$",
-                message="The password must  including at least one uppercase letter, one lowercase letter, one number, and one special character.",
+                message="The password must  including at least one uppercase letter, one lowercase letter, one number.",
                 code="invalid_password",
             )
         ],
