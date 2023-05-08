@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import Product, CategoryOptions
 
 
-
 class ProductSerializer(serializers.ModelSerializer):
     category = serializers.ChoiceField(choices=CategoryOptions.choices)
 
@@ -26,7 +25,6 @@ class ProductSerializer(serializers.ModelSerializer):
             "updated_at",
             "seller_id",
         ]
-    
     def validate_category(self, value):
         choices = dict(self.CategoryOptions.choices)
         if value not in choices:
