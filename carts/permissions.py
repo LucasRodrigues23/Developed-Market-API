@@ -1,6 +1,5 @@
 from rest_framework import permissions
 from .models import Cart
-from rest_framework.views import View
 
 
 class IsCartOwner(permissions.BasePermission):
