@@ -89,7 +89,9 @@ class UserSerializer(serializers.ModelSerializer):
             address_dict = validated_data.address.__dict__
             find_address = AddressSerializer(data=address_dict)
             find_address.is_valid(raise_exception=True)
-            return find_address.data
+            response = find_address.data
+            response["address_id"] = address_dict["id"]
+            return response
         except Exception:
             return None
 
