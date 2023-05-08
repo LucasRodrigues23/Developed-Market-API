@@ -4,6 +4,9 @@ from django.core.validators import RegexValidator
 from .models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from carts.models import Cart
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
+from addresses.serializers import AddressSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[
             RegexValidator(
                 regex=r"^\d{3}\.\d{3}\.\d{3}-\d{2}$",
-                message="CPF inválido. Use o formato XXX.XXX.XXX-XX.",
+                message="Invalid CPF. Use the format XXX.XXX.XXX-XX.",
                 code="invalid_cpf",
             ),
             UniqueValidator(
@@ -41,13 +44,14 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[
             RegexValidator(
                 regex=r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$",
-                message="The password must  including at least one uppercase letter, one lowercase letter, one number, and one special character.",
+                message="The password must  including at least one uppercase letter, one lowercase letter, one number.",
                 code="invalid_password",
             )
         ],
     )
 
     cart_id = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -68,14 +72,28 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "cart_id",
+            "address",
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "cart_id"]
+        read_only_fields = ["id", "created_at", "updated_at", "cart_id", "address"]
         extra_kwargs = {
             "password": {"write_only": True},
         }
 
+    @extend_schema_field(OpenApiTypes.UUID)
     def get_cart_id(self, validated_data):
         return validated_data.cart.id
+
+    @extend_schema_field(AddressSerializer or None)
+    def get_address(self, validated_data):
+        try:
+            address_dict = validated_data.address.__dict__
+            find_address = AddressSerializer(data=address_dict)
+            find_address.is_valid(raise_exception=True)
+            response = find_address.data
+            response["address_id"] = address_dict["id"]
+            return response
+        except Exception:
+            return None
 
     def create(self, validated_data: dict) -> User:
         is_superuser = validated_data.pop("is_superuser", None)

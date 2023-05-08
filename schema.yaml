@@ -21,7 +21,7 @@ paths:
         schema:
           type: integer
       tags:
-      - api
+      - Carts
       security:
       - jwtAuth: []
       responses:
@@ -30,6 +30,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedCartRetrieveList'
+              examples:
+                ExampleListCart:
+                  value:
+                    count: 123
+                    next: http://api.example.org/accounts/?page=4
+                    previous: http://api.example.org/accounts/?page=2
+                    results:
+                    - id: fbf8e423-e82a-4f44-a82d-493873ce6a63
+                      total_value_cart: 159.9
+                      cart_list:
+                      - quantity: 2
+                        total_product: 24.36
+                        product:
+                          id: b7f3f2ec-0c9b-4200-b650-6c02775845db
+                          name: teste2
+                          description: testestestestestes
+                          price: '12.18'
+                          brand: teste
+                          category: Others
+                          seller_id: 513a656c-9f96-4847-9cb1-5aa3ff534996
+                      - quantity: 3
+                        total_product: 135.54
+                        product:
+                          id: a359a2dd-2c80-44a8-9921-1361032d794d
+                          name: teste3
+                          description: testestestestestes
+                          price: '45.18'
+                          brand: teste
+                          category: Others
+                          seller_id: 513a656c-9f96-4847-9cb1-5aa3ff534996
+                  summary: List Cart
           description: ''
   /api/carts/{cart_id}/orders/:
     post:
@@ -42,27 +73,61 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Carts
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PurchaseOrders'
+              $ref: '#/components/schemas/PurchaseOrdersCreate'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/PurchaseOrders'
+              $ref: '#/components/schemas/PurchaseOrdersCreate'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/PurchaseOrders'
+              $ref: '#/components/schemas/PurchaseOrdersCreate'
       security:
       - jwtAuth: []
-      - {}
       responses:
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PurchaseOrders'
+                $ref: '#/components/schemas/PurchaseOrdersCreate'
+              examples:
+                ExampleCreateOrder:
+                  value:
+                    orders:
+                    - id: f9cb24c1-0ef5-472e-adad-082b27248908
+                      status: Em Andamento
+                      price: 1700.0
+                      quantity_items: 2
+                      client_id: 53823c8d-c5cc-4311-a4dc-0586e930ae5a
+                      seller_id: 797c2e48-b070-42ca-ad95-c686b84a44c8
+                      created_at: '2023-05-06T14:52:42.775926Z'
+                      updated_at: '2023-05-06T14:52:42.775948Z'
+                      products:
+                      - id: 57d1fe59-c647-483c-85c1-8d8162e6ddff
+                        name: Produto Ruim
+                        description: testestestestestes
+                        price: '850.00'
+                        brand: Marca Ruim
+                        seller_id: 797c2e48-b070-42ca-ad95-c686b84a44c8
+                    - id: 2fcf2d63-a33a-4b41-90fc-88e4906150e8
+                      status: Em Andamento
+                      price: 198.0
+                      quantity_items: 2
+                      client_id: 53823c8d-c5cc-4311-a4dc-0586e930ae5a
+                      seller_id: 50e4b827-bb03-416c-9b92-890273403d9a
+                      created_at: '2023-05-06T14:52:43.731255Z'
+                      updated_at: '2023-05-06T14:52:43.731282Z'
+                      products:
+                      - id: 64f3f929-1416-4f06-ac24-259126d8e794
+                        name: Shorts Jeans
+                        description: Summer-essential cutoffs
+                        price: '99.00'
+                        brand: Denim
+                        seller_id: 50e4b827-bb03-416c-9b92-890273403d9a
+                  summary: Create Order
           description: ''
   /api/carts/{cart_id}/products/:
     post:
@@ -75,7 +140,7 @@ paths:
           format: uuid
         required: true
       tags:
-      - api
+      - Carts
       requestBody:
         content:
           application/json:
@@ -104,7 +169,7 @@ paths:
         Takes a set of user credentials and returns an access and refresh JSON web
         token pair to prove the authentication of those credentials.
       tags:
-      - api
+      - Autenticação
       requestBody:
         content:
           application/json:
@@ -124,6 +189,143 @@ paths:
               schema:
                 $ref: '#/components/schemas/CustomJWT'
           description: ''
+  /api/orders/{id}/seller/:
+    get:
+      operationId: api_orders_seller_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrdersUpdate'
+          description: ''
+    put:
+      operationId: api_orders_seller_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrdersUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrdersUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrdersUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrdersUpdate'
+          description: ''
+    patch:
+      operationId: api_orders_seller_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPurchaseOrdersUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPurchaseOrdersUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPurchaseOrdersUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrdersUpdate'
+          description: ''
+  /api/orders/client/{user_id}/:
+    get:
+      operationId: api_orders_client_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPurchaseOrdersListClientList'
+          description: ''
+  /api/orders/seller/{user_id}/:
+    get:
+      operationId: api_orders_seller_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPurchaseOrdersListClientList'
+          description: ''
   /api/products/:
     get:
       operationId: api_products_list
@@ -135,7 +337,7 @@ paths:
         schema:
           type: integer
       tags:
-      - api
+      - Products
       security:
       - jwtAuth: []
       responses:
@@ -148,7 +350,7 @@ paths:
     post:
       operationId: api_products_create
       tags:
-      - api
+      - Products
       requestBody:
         content:
           application/json:
@@ -171,41 +373,17 @@ paths:
                 $ref: '#/components/schemas/Product'
           description: ''
   /api/products/{id}/:
-    get:
-      operationId: api_products_list_2
+    put:
+      operationId: api_products_update
       parameters:
       - in: path
         name: id
         schema:
-          type: integer
-        required: true
-      - name: page
-        required: false
-        in: query
-        description: A page number within the paginated result set.
-        schema:
-          type: integer
-      tags:
-      - api
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedProductList'
-          description: ''
-    post:
-      operationId: api_products_create_2
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
+          type: string
+          format: uuid
         required: true
       tags:
-      - api
+      - Products
       requestBody:
         content:
           application/json:
@@ -221,7 +399,38 @@ paths:
       security:
       - jwtAuth: []
       responses:
-        '201':
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+    patch:
+      operationId: api_products_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
           content:
             application/json:
               schema:
@@ -234,7 +443,7 @@ paths:
         Takes a refresh type JSON web token and returns an access type JSON web
         token if the refresh token is valid.
       tags:
-      - api
+      - Autenticação
       requestBody:
         content:
           application/json:
@@ -258,7 +467,67 @@ paths:
     post:
       operationId: api_users_create
       tags:
-      - api
+      - Users
+      - Autenticação
+      - Products
+      - Carts
+      - Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/:
+    get:
+      operationId: api_users_retrieve
+      description: testando a descrição por rota GET
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: api_users_update
+      description: testando a descrição por rota PUT
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Users
       requestBody:
         content:
           application/json:
@@ -274,7 +543,39 @@ paths:
       security:
       - jwtAuth: []
       responses:
-        '201':
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: api_users_partial_update
+      description: testando a descrição por rota PATCH
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
           content:
             application/json:
               schema:
@@ -284,7 +585,7 @@ paths:
     post:
       operationId: api_users_address_create
       tags:
-      - api
+      - Users
       requestBody:
         content:
           application/json:
@@ -391,7 +692,8 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         total_product:
-          type: string
+          type: number
+          format: float
           readOnly: true
         product:
           $ref: '#/components/schemas/ProductCartList'
@@ -482,6 +784,151 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Product'
+    PaginatedPurchaseOrdersListClientList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseOrdersListClient'
+    PatchedProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          nullable: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        quantity_stock:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        is_available_for_sale:
+          type: boolean
+          readOnly: true
+        brand:
+          type: string
+          nullable: true
+          maxLength: 50
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        seller_id:
+          type: string
+          format: uuid
+          readOnly: true
+    PatchedPurchaseOrdersUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        quantity_items:
+          type: integer
+          readOnly: true
+        user_id:
+          type: string
+          format: uuid
+          readOnly: true
+        seller_id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 50
+        last_name:
+          type: string
+          maxLength: 100
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+          pattern: ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$
+          maxLength: 128
+          minLength: 8
+        email:
+          type: string
+          format: email
+        cpf:
+          type: string
+          pattern: ^\d{3}\.\d{3}\.\d{3}-\d{2}$
+          maxLength: 14
+        bio:
+          type: string
+          nullable: true
+        birthdate:
+          type: string
+          format: date
+          nullable: true
+        is_superuser:
+          type: boolean
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        is_seller:
+          type: boolean
+          nullable: true
+        is_client:
+          type: boolean
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        cart_id:
+          type: string
+          format: uuid
+          readOnly: true
     Product:
       type: object
       properties:
@@ -504,7 +951,7 @@ components:
           maximum: 2147483647
           minimum: -2147483648
         is_available_for_sale:
-          type: string
+          type: boolean
           readOnly: true
         brand:
           type: string
@@ -555,7 +1002,37 @@ components:
       - name
       - price
       - seller_id
-    PurchaseOrders:
+    ProductOrderList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        brand:
+          type: string
+          nullable: true
+        seller_id:
+          type: string
+          format: uuid
+        product_quantity:
+          type: integer
+      required:
+      - brand
+      - description
+      - id
+      - name
+      - price
+      - product_quantity
+      - seller_id
+    PurchaseOrdersCreate:
       type: object
       properties:
         id:
@@ -579,7 +1056,8 @@ components:
           format: uuid
           readOnly: true
         orders:
-          type: string
+          allOf:
+          - $ref: '#/components/schemas/PurchaseOrdersListClient'
           readOnly: true
       required:
       - id
@@ -588,6 +1066,103 @@ components:
       - quantity_items
       - seller_id
       - user_id
+    PurchaseOrdersListClient:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        quantity_items:
+          type: integer
+          readOnly: true
+        user_id:
+          type: string
+          format: uuid
+          readOnly: true
+        seller_id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        products:
+          allOf:
+          - $ref: '#/components/schemas/ProductOrderList'
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - price
+      - products
+      - quantity_items
+      - seller_id
+      - updated_at
+      - user_id
+    PurchaseOrdersUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        quantity_items:
+          type: integer
+          readOnly: true
+        user_id:
+          type: string
+          format: uuid
+          readOnly: true
+        seller_id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - price
+      - quantity_items
+      - seller_id
+      - updated_at
+      - user_id
+    StatusEnum:
+      enum:
+      - Em Andamento
+      - Pedido Realizado
+      - Entregue
+      type: string
+      description: |-
+        * `Em Andamento` - Default
+        * `Pedido Realizado` - Acoomplished
+        * `Entregue` - Delivered
     TokenRefresh:
       type: object
       properties:
@@ -654,7 +1229,12 @@ components:
           type: string
           format: date-time
           readOnly: true
+        cart_id:
+          type: string
+          format: uuid
+          readOnly: true
       required:
+      - cart_id
       - cpf
       - created_at
       - email
