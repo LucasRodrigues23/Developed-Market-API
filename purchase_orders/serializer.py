@@ -260,10 +260,13 @@ class StatusPossibleChoice(serializers.ChoiceField):
     status_options = []
     for item in StatusChoices.choices:
         status_options.append(item[0])
-    default_error_messages = {"invalid_choice": _('{input} is not valid ') + f"The available status are {status_options}" }
+        status_options_str = str(status_options)[1:-1]
+    default_error_messages = {"invalid_choice": _('{input} is not valid! ') + f"The available status are {status_options_str}" }
 
 
 class PurchaseOrdersUpdateSerializer(serializers.ModelSerializer):
+    status = StatusPossibleChoice(choices=StatusChoices.choices)
+
     def update(self, instance: PurchaseOrders, validated_data: dict) -> PurchaseOrders:
         for key, value in validated_data.items():
             if key == "status":

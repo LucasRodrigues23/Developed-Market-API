@@ -7,7 +7,8 @@ class CategoryChoice(serializers.ChoiceField):
     category_options = []
     for item in CategoryOptions.choices:
         category_options.append(item[0])
-    default_error_messages = {"invalid_choice": _('{input} is not valid ') + f"The available categories are {category_options}" }
+        category_options_str = str(category_options)[1:-1]
+    default_error_messages = {"invalid_choice": _('{input} is not valid! ') + f"The available categories are: {category_options_str}" }
 
 
 class ProductSerializer(serializers.ModelSerializer):
