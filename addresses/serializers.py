@@ -39,7 +39,7 @@ class AddressSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data: dict) -> Address:
-        user_id = validated_data.get("user").id
+        user_id = validated_data.get("user_id")
         if Address.objects.filter(user_id=user_id).exists():
             raise serializers.ValidationError(
                 {"message": "User already has a registered address."}
