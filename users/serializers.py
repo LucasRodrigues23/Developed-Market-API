@@ -4,6 +4,8 @@ from django.core.validators import RegexValidator
 from .models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from carts.models import Cart
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema_field
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,7 +43,7 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[
             RegexValidator(
                 regex=r"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$",
-                message="The password must  including at least one uppercase letter, one lowercase letter, one number, and one special character.",
+                message="The password must  including at least one uppercase letter, one lowercase letter, one number.",
                 code="invalid_password",
             )
         ],
@@ -74,6 +76,7 @@ class UserSerializer(serializers.ModelSerializer):
             "password": {"write_only": True},
         }
 
+    @extend_schema_field(OpenApiTypes.UUID)
     def get_cart_id(self, validated_data):
         return validated_data.cart.id
 

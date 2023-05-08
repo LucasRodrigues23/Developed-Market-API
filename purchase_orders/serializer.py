@@ -3,6 +3,12 @@ from carts.models import CartListProducts
 from .models import PurchaseOrders, OrderItems
 from django.core.mail import send_mail
 from django.conf import settings
+from drf_spectacular.utils import (
+    extend_schema_serializer,
+    extend_schema_field,
+    OpenApiExample,
+)
+from drf_spectacular.types import OpenApiTypes
 
 
 class ProductCartSerializer(serializers.Serializer):
@@ -14,6 +20,121 @@ class ProductCartSerializer(serializers.Serializer):
     seller_id = serializers.UUIDField()
 
 
+class ProductOrderListSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField()
+    description = serializers.CharField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    brand = serializers.CharField(allow_null=True)
+    seller_id = serializers.UUIDField()
+    product_quantity = serializers.IntegerField()
+
+
+class PurchaseOrdersListClientSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PurchaseOrders
+        fields = [
+            "id",
+            "status",
+            "price",
+            "quantity_items",
+            "user_id",
+            "seller_id",
+            "created_at",
+            "updated_at",
+            "products",
+        ]
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "price",
+            "quantity_items",
+            "products",
+        ]
+
+    @extend_schema_field(ProductOrderListSerializer)
+    def get_products(self, validated_data):
+        order_id = validated_data.id
+
+        queryset_order_items = OrderItems.objects.filter(
+            purchase_order=order_id
+        ).select_related("product")
+
+        list_order_items = [order_items for order_items in queryset_order_items]
+
+        list_products = []
+        for item in list_order_items:
+            product_order = item.product.__dict__
+            product_order["product_quantity"] = item.quantity
+            list_products.append(product_order)
+
+        list_products_serializer = ProductOrderListSerializer(
+            data=list_products, many=True
+        )
+        list_products_serializer.is_valid(raise_exception=True)
+
+        return list_products_serializer.data
+
+
+@extend_schema_serializer(
+    # exclude_fields=("sex",),
+    examples=[
+        OpenApiExample(
+            "Example create order",
+            summary="Create Order",
+            # description="Rota para criação de animais",
+            value={
+                "orders": [
+                    {
+                        "id": "f9cb24c1-0ef5-472e-adad-082b27248908",
+                        "status": "Em Andamento",
+                        "price": 1700.0,
+                        "quantity_items": 2,
+                        "client_id": "53823c8d-c5cc-4311-a4dc-0586e930ae5a",
+                        "seller_id": "797c2e48-b070-42ca-ad95-c686b84a44c8",
+                        "created_at": "2023-05-06T14:52:42.775926Z",
+                        "updated_at": "2023-05-06T14:52:42.775948Z",
+                        "products": [
+                            {
+                                "id": "57d1fe59-c647-483c-85c1-8d8162e6ddff",
+                                "name": "Produto Ruim",
+                                "description": "testestestestestes",
+                                "price": "850.00",
+                                "brand": "Marca Ruim",
+                                "seller_id": "797c2e48-b070-42ca-ad95-c686b84a44c8",
+                            }
+                        ],
+                    },
+                    {
+                        "id": "2fcf2d63-a33a-4b41-90fc-88e4906150e8",
+                        "status": "Em Andamento",
+                        "price": 198.0,
+                        "quantity_items": 2,
+                        "client_id": "53823c8d-c5cc-4311-a4dc-0586e930ae5a",
+                        "seller_id": "50e4b827-bb03-416c-9b92-890273403d9a",
+                        "created_at": "2023-05-06T14:52:43.731255Z",
+                        "updated_at": "2023-05-06T14:52:43.731282Z",
+                        "products": [
+                            {
+                                "id": "64f3f929-1416-4f06-ac24-259126d8e794",
+                                "name": "Shorts Jeans",
+                                "description": "Summer-essential cutoffs",
+                                "price": "99.00",
+                                "brand": "Denim",
+                                "seller_id": "50e4b827-bb03-416c-9b92-890273403d9a",
+                            }
+                        ],
+                    },
+                ]
+            },
+            request_only=False,
+            response_only=True,
+        )
+    ],
+)
 class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
     orders = serializers.SerializerMethodField()
 
@@ -29,6 +150,7 @@ class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
             "orders",
         ]
 
+    @extend_schema_field(PurchaseOrdersListClientSerializer)
     def get_orders(self, validated_data):
         list_orders = validated_data[0]
         list_cart_products = validated_data[1]
@@ -133,73 +255,6 @@ class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
         cart_list.delete()
         return [order_list, cart_list]
 
-    """def update(self, instance: PurchaseOrders, validated_data: dict) -> PurchaseOrders:
-        for key, value in validated_data.items():
-            if key == "status" and value != "Entregue":
-                setattr(instance, key, value)
-
-        instance.save()
-
-        return instance"""
-
-
-class ProductOrderListSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    name = serializers.CharField()
-    description = serializers.CharField()
-    price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    brand = serializers.CharField(allow_null=True)
-    seller_id = serializers.UUIDField()
-    product_quantity = serializers.IntegerField()
-
-
-class PurchaseOrdersListClientSerializer(serializers.ModelSerializer):
-    products = serializers.SerializerMethodField()
-
-    class Meta:
-        model = PurchaseOrders
-        fields = [
-            "id",
-            "status",
-            "price",
-            "quantity_items",
-            "user_id",
-            "seller_id",
-            "created_at",
-            "updated_at",
-            "products",
-        ]
-        read_only_fields = [
-            "id",
-            "created_at",
-            "updated_at",
-            "price",
-            "quantity_items",
-            "products",
-        ]
-
-    def get_products(self, validated_data):
-        order_id = validated_data.id
-
-        queryset_order_items = OrderItems.objects.filter(
-            purchase_order=order_id
-        ).select_related("product")
-
-        list_order_items = [order_items for order_items in queryset_order_items]
-
-        list_products = []
-        for item in list_order_items:
-            product_order = item.product.__dict__
-            product_order["product_quantity"] = item.quantity
-            list_products.append(product_order)
-
-        list_products_serializer = ProductOrderListSerializer(
-            data=list_products, many=True
-        )
-        list_products_serializer.is_valid(raise_exception=True)
-
-        return list_products_serializer.data
-
 
 class PurchaseOrdersUpdateSerializer(serializers.ModelSerializer):
     def update(self, instance: PurchaseOrders, validated_data: dict) -> PurchaseOrders:
@@ -243,4 +298,14 @@ class PurchaseOrdersUpdateSerializer(serializers.ModelSerializer):
             "seller_id",
             "created_at",
             "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "created_at",
+            "updated_at",
+            "user_id",
+            "seller_id",
+            "price",
+            "quantity_items",
+            "products",
         ]

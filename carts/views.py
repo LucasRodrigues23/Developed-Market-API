@@ -3,8 +3,7 @@ from .models import CartListProducts, Cart
 from .serializers import CartListProductsSerializer, CartRetrieveSerializer
 from .permissions import IsCartOwner
 from django.shortcuts import get_object_or_404
-
-
+from drf_spectacular.utils import extend_schema
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
@@ -20,6 +19,9 @@ class CustomPaginationCartRetrieve(PageNumberPagination):
         )
 
 
+@extend_schema(
+    tags=["Carts"],
+)
 class CartListProductsView(CreateAPIView):
     permission_classes = [IsCartOwner]
     queryset = CartListProducts.objects.all()
@@ -32,6 +34,9 @@ class CartListProductsView(CreateAPIView):
         )
 
 
+@extend_schema(
+    tags=["Carts"],
+)
 class CartRetrieve(ListAPIView):
     permission_classes = [IsCartOwner]
     serializer_class = CartRetrieveSerializer
