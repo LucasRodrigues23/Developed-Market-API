@@ -16,7 +16,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 
-@extend_schema(tags=["Users", "Autenticação", "Products", "Carts", "Orders"])
 @extend_schema(
     tags=["Users"],
 )
