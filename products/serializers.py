@@ -1,9 +1,17 @@
 from rest_framework import serializers
 from .models import Product, CategoryOptions
+from django.utils.translation import gettext_lazy as _
+
+
+class CategoryChoice(serializers.ChoiceField):
+    category_options = []
+    for item in CategoryOptions.choices:
+        category_options.append(item[0])
+    default_error_messages = {"invalid_choice": _('{input} is not valid ') + f"The available categories are {category_options}" }
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = serializers.ChoiceField(choices=CategoryOptions.choices)
+    category = CategoryChoice(choices=CategoryOptions.choices)
 
     class Meta:
         model = Product
@@ -25,14 +33,6 @@ class ProductSerializer(serializers.ModelSerializer):
             "updated_at",
             "seller_id",
         ]
-    def validate_category(self, value):
-        choices = dict(self.CategoryOptions.choices)
-        if value not in choices:
-            raise serializers.ValidationError(
-                f"The available categories are: {', '.join(choices.values())}"
-            )
-        return value
-        
 
     def create(self, validated_data):
         if validated_data["quantity_stock"] > 0:

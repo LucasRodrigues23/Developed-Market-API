@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from carts.models import CartListProducts
-from .models import PurchaseOrders, OrderItems
+from django.utils.translation import gettext_lazy as _
+from .models import PurchaseOrders, OrderItems, StatusChoices
 from django.core.mail import send_mail
 from django.conf import settings
 from drf_spectacular.utils import (
@@ -254,6 +255,12 @@ class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
 
         cart_list.delete()
         return [order_list, cart_list]
+
+class StatusPossibleChoice(serializers.ChoiceField):
+    status_options = []
+    for item in StatusChoices.choices:
+        status_options.append(item[0])
+    default_error_messages = {"invalid_choice": _('{input} is not valid ') + f"The available status are {status_options}" }
 
 
 class PurchaseOrdersUpdateSerializer(serializers.ModelSerializer):
