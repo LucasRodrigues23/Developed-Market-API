@@ -1,5 +1,6 @@
 from rest_framework import permissions
 from users.models import User
+from .models import Address
 
 
 class IsAddressCreatePermissionr(permissions.BasePermission):
@@ -12,4 +13,13 @@ class IsAddressCreatePermissionr(permissions.BasePermission):
             request.user.is_authenticated
             and user_owner
             and (str(user_id) == str(request.user.id))
+        )
+
+
+class IsAddressOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj: Address) -> bool:
+        return (
+            request.user.is_authenticated
+            and obj.user_id == request.user.id
+            or request.user.is_superuser
         )

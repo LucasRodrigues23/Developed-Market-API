@@ -51,6 +51,9 @@ class CartRetrieve(ListAPIView):
         )
 
 
+@extend_schema(
+    tags=["Carts"],
+)
 class RemoveProduct(DestroyAPIView):
     permission_classes = [IsCartOwner]
     queryset = Cart.objects.all()
@@ -60,6 +63,8 @@ class RemoveProduct(DestroyAPIView):
         product_id = self.kwargs["product_id"]
         cart_id = self.kwargs["pk"]
         product = get_object_or_404(Product, id=product_id)
-        cart_product = CartListProducts.objects.filter(product_id=product_id, cart_id=cart_id)
+        cart_product = CartListProducts.objects.filter(
+            product_id=product_id, cart_id=cart_id
+        )
 
         cart_product.delete()
