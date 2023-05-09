@@ -249,9 +249,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartListProducts'
           description: ''
-  /api/carts/{id}/product/{product_id}/:
+  /api/carts/{id}/products/{product_id}/:
     delete:
-      operationId: api_carts_product_destroy
+      operationId: api_carts_products_destroy
       description: "Remove um produto do carrinho de compras, a partir do id,\n  \
         \  do carrinho e do id do produto, informados nos parâmetros da rota.\n  \
         \   O usuário logado precisa ser admin ou dono do carrinho de compras.\n \
