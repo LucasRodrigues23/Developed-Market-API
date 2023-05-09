@@ -17,7 +17,7 @@ urlpatterns = [
         PurchaseOrderCreateView.as_view(),
     ),
     path(
-        "carts/<uuid:pk>/product/<uuid:product_id>/",
+        "carts/<uuid:pk>/products/<uuid:product_id>/",
         views.RemoveProduct.as_view(),
     ),
 ]
