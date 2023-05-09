@@ -1,12 +1,92 @@
 openapi: 3.0.3
 info:
-  title: Market place API
+  title: Developed Market API
   version: 1.0.0
-  description: Entrega em grupo sprint 7-8
+  description: "Developed Market API é uma API RESTFul desenvolvida em \n    pyhton,\
+    \ com django, cujo principal objetivo é sustentar a plataforma de \n    e-commerce,\
+    \ com mesmo nome. Possuindo três níveis de acesso e permissão \n    (Admin, Seller\
+    \ e Client), a aplicação permite criar e atualizar usuários,\n    criar produtos\
+    \ e movimentar seu estoque, adicionar produtos a um carrinho\n    de compras e\
+    \ realizar pedidos. Também é possivel listar pedidos realizados\n    ou vendidos\
+    \ e gerar relatórios de vendas em pdf. "
 paths:
+  /api/address/{id}/:
+    patch:
+      operationId: api_address_partial_update
+      description: |-
+        Atualiza um endereço, a partir do seu id
+            informado nos parâmetros da rota.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+  /api/address/users/{user_id}/:
+    post:
+      operationId: api_address_users_create
+      description: |-
+        Cria um endereço para um usuário, o qual
+             teve seu id informado nos parâmetros da rota.
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Address'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
   /api/carts/{cart_id}/:
     get:
       operationId: api_carts_list
+      description: "Lista os produtos presentes no carrinho de compras, a partir do\
+        \ id,\n    do carrinho, informado no parâmetro da rota. O usuário logado precisa\
+        \ ser admin\n    ou dono do carrinho de compras.\n    "
       parameters:
       - in: path
         name: cart_id
@@ -65,6 +145,9 @@ paths:
   /api/carts/{cart_id}/orders/:
     post:
       operationId: api_carts_orders_create
+      description: "Cria o pedido de compra, baseado no carrinho de compras do usuário,\n\
+        \    a partir do id do carrinho, informado no parâmetro da rota. O usuário\
+        \ logado \n    precisa ser admin ou dono do carrinho de compras.\n    "
       parameters:
       - in: path
         name: cart_id
@@ -132,6 +215,10 @@ paths:
   /api/carts/{cart_id}/products/:
     post:
       operationId: api_carts_products_create
+      description: "Adiciona um produto ao carrinho de compras, a partir do id,\n\
+        \    do carrinho, informado no parâmetro da rota. O id do produto é enviado\
+        \ no\n    body, assim como a quantidade do mesmo. O usuário logado precisa\
+        \ ser admin\n    ou dono do carrinho de compras.\n    "
       parameters:
       - in: path
         name: cart_id
@@ -165,6 +252,10 @@ paths:
   /api/carts/{id}/product/{product_id}/:
     delete:
       operationId: api_carts_product_destroy
+      description: "Remove um produto do carrinho de compras, a partir do id,\n  \
+        \  do carrinho e do id do produto, informados nos parâmetros da rota.\n  \
+        \   O usuário logado precisa ser admin ou dono do carrinho de compras.\n \
+        \   "
       parameters:
       - in: path
         name: id
@@ -188,9 +279,9 @@ paths:
   /api/login/:
     post:
       operationId: api_login_create
-      description: |-
-        Takes a set of user credentials and returns an access and refresh JSON web
-        token pair to prove the authentication of those credentials.
+      description: "Utiliza das credencias do usuário (username e password),\n   \
+        \ para realizar autenticação e retorna dois tokens, um de acesso e outro de\
+        \ \n    atualização."
       tags:
       - Autenticação
       requestBody:
@@ -215,6 +306,9 @@ paths:
   /api/orders/{id}/seller/:
     get:
       operationId: api_orders_seller_retrieve
+      description: "Lista um pedido vendido por um vendedor,\n    a partir do id do\
+        \ pedido, informado no parâmetro da rota. \n    O usuário logado precisa ser\
+        \ admin ou dono das informações.\n    "
       parameters:
       - in: path
         name: id
@@ -224,38 +318,6 @@ paths:
         required: true
       tags:
       - Orders
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PurchaseOrdersUpdate'
-          description: ''
-    put:
-      operationId: api_orders_seller_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - Orders
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PurchaseOrdersUpdate'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PurchaseOrdersUpdate'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PurchaseOrdersUpdate'
-        required: true
       security:
       - jwtAuth: []
       responses:
@@ -267,6 +329,9 @@ paths:
           description: ''
     patch:
       operationId: api_orders_seller_partial_update
+      description: "Atualizar o status de um pedido vendido por um vendedor,\n   \
+        \ a partir do id do pedido, informado no parâmetro da rota. \n    O usuário\
+        \ logado precisa ser admin ou dono das informações.\n    "
       parameters:
       - in: path
         name: id
@@ -299,6 +364,9 @@ paths:
   /api/orders/client/{user_id}/:
     get:
       operationId: api_orders_client_list
+      description: "Lista os pedidos realizados por um cliente,\n    a partir do id\
+        \ do usuário, informado no parâmetro da rota. O usuário logado \n    precisa\
+        \ ser admin ou dono das informações.\n    "
       parameters:
       - name: page
         required: false
@@ -326,7 +394,9 @@ paths:
   /api/orders/sales-summary/seller/{id}/:
     get:
       operationId: api_orders_sales_summary_seller_retrieve
-      description: Retorna um resumo em PDF das vendas.
+      description: "Gera um pdf, contendo o resumo de vendas, do vendedor,\n    a\
+        \ partir do id do vendedor, informado no parâmetro da rota. \n    O usuário\
+        \ logado precisa ser admin ou dono das informações.\n    "
       parameters:
       - in: path
         name: id
@@ -349,17 +419,13 @@ paths:
                     schema:
                       type: string
                       format: binary
-                    example: '...'
-                headers:
-                  Content-Disposition:
-                    description: Cabeçalho para fazer o navegador baixar o arquivo.
-                    schema:
-                      type: string
-                    example: attachment; filename=sales_summary.pdf
           description: ''
   /api/orders/seller/{user_id}/:
     get:
       operationId: api_orders_seller_list
+      description: "Lista os pedidos vendidos por um vendedor,\n    a partir do id\
+        \ do usuário, informado no parâmetro da rota. \n    O usuário logado precisa\
+        \ ser admin ou dono das informações.\n    "
       parameters:
       - name: page
         required: false
@@ -387,7 +453,26 @@ paths:
   /api/products/:
     get:
       operationId: api_products_list
+      description: "Lista todos os produtos cadastrados. É possivel realizar\n   \
+        \ filtros na listagem por id, name e categoria do produto. Não é preciso \n\
+        \    está logado para acessar a rota.\n    "
       parameters:
+      - in: query
+        name: category
+        schema:
+          type: string
+        description: Categoria do produto
+      - in: query
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: Id do produto
+      - in: query
+        name: name
+        schema:
+          type: string
+        description: Nome do produto
       - name: page
         required: false
         in: query
@@ -407,6 +492,8 @@ paths:
           description: ''
     post:
       operationId: api_products_create
+      description: "Cadastra um produto, sendo permitido apenas \n    para usuários\
+        \ seller e admin.\n    "
       tags:
       - Products
       requestBody:
@@ -431,40 +518,11 @@ paths:
                 $ref: '#/components/schemas/Product'
           description: ''
   /api/products/{id}/:
-    put:
-      operationId: api_products_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - Products
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Product'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Product'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Product'
-        required: true
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Product'
-          description: ''
     patch:
       operationId: api_products_partial_update
+      description: "Atualiza o estoque do produto, a partir do id do produto,\n  \
+        \  informado no parâmetro da rota. Só é possível atualizar o estoque do produto\n\
+        \    pelo vendedor que cadastrou o produto, ou por um usuário admin.\n    "
       parameters:
       - in: path
         name: id
@@ -497,9 +555,8 @@ paths:
   /api/token/refresh/:
     post:
       operationId: api_token_refresh_create
-      description: |-
-        Takes a refresh type JSON web token and returns an access type JSON web
-        token if the refresh token is valid.
+      description: "Utiliza do token de atualização, para gerar um novo token \n \
+        \   de acesso."
       tags:
       - Autenticação
       requestBody:
@@ -524,6 +581,7 @@ paths:
   /api/users/:
     post:
       operationId: api_users_create
+      description: "Cria um usuário, podendo ser admin, \n     seller ou client."
       tags:
       - Users
       requestBody:
@@ -551,7 +609,9 @@ paths:
   /api/users/{id}/:
     get:
       operationId: api_users_retrieve
-      description: testando a descrição por rota GET
+      description: "Listar informações do usuário, a partir do id\n    informado no\
+        \ parâmetro da rota. O usuário logado precisa ser \n    admin ou dono das\
+        \ informações."
       parameters:
       - in: path
         name: id
@@ -561,39 +621,6 @@ paths:
         required: true
       tags:
       - Users
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-          description: ''
-    put:
-      operationId: api_users_update
-      description: testando a descrição por rota PUT
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - Users
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/User'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/User'
-        required: true
       security:
       - jwtAuth: []
       responses:
@@ -605,7 +632,9 @@ paths:
           description: ''
     patch:
       operationId: api_users_partial_update
-      description: testando a descrição por rota PATCH
+      description: "Atualizar as informações do usuário, a partir do id\n    informado\
+        \ no parâmetro da rota. O usuário logado precisa ser \n    admin ou dono das\
+        \ informações."
       parameters:
       - in: path
         name: id
@@ -635,106 +664,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
-  /api/users/{user_id}/address/:
-    post:
-      operationId: api_users_address_create
-      parameters:
-      - in: path
-        name: user_id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - Address
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Address'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Address'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Address'
-        required: true
-      security:
-      - jwtAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Address'
-          description: ''
-  /api/users/address/{id}/:
-    put:
-      operationId: api_users_address_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - Address
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Address'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Address'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/Address'
-        required: true
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Address'
-          description: ''
-    patch:
-      operationId: api_users_address_partial_update
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: string
-          format: uuid
-        required: true
-      tags:
-      - Address
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PatchedAddress'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/PatchedAddress'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/PatchedAddress'
-      security:
-      - jwtAuth: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Address'
-          description: ''
   /api/users/profile/:
     get:
       operationId: api_users_profile_list
+      description: Listar informações do usuário logado.
       parameters:
       - name: page
         required: false
