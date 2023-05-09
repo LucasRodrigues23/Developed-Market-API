@@ -4,7 +4,6 @@ from rest_framework.generics import (
     CreateAPIView,
     RetrieveUpdateAPIView,
     ListAPIView,
-    RetrieveAPIView,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .permissions import IsAccountOwner
