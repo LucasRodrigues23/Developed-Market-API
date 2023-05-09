@@ -187,8 +187,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Market place API",
-    "DESCRIPTION": "Entrega em grupo sprint 7-8",
+    "TITLE": "Developed Market API",
+    "DESCRIPTION": """Developed Market API é uma API RESTFul desenvolvida em 
+    pyhton, com django, cujo principal objetivo é sustentar a plataforma de 
+    e-commerce, com mesmo nome. Possuindo três níveis de acesso e permissão 
+    (Admin, Seller e Client), a aplicação permite criar e atualizar usuários,
+    criar produtos e movimentar seu estoque, adicionar produtos a um carrinho
+    de compras e realizar pedidos. Também é possivel listar pedidos realizados
+    ou vendidos e gerar relatórios de vendas em pdf. """,
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     # OTHER SETTINGS
