@@ -162,6 +162,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartListProducts'
           description: ''
+  /api/carts/{id}/product/{product_id}/:
+    delete:
+      operationId: api_carts_product_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: product_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Carts
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
   /api/login/:
     post:
       operationId: api_login_create
@@ -232,6 +255,7 @@ paths:
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/PurchaseOrdersUpdate'
+        required: true
       security:
       - jwtAuth: []
       responses:
@@ -298,6 +322,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedPurchaseOrdersListClientList'
+          description: ''
+  /api/orders/sales-summary/seller/{id}/:
+    get:
+      operationId: api_orders_sales_summary_seller_retrieve
+      description: Retorna um resumo em PDF das vendas.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: Arquivo PDF com o resumo das vendas.
+                content:
+                  application/pdf:
+                    schema:
+                      type: string
+                      format: binary
+                    example: '...'
+                headers:
+                  Content-Disposition:
+                    description: Cabeçalho para fazer o navegador baixar o arquivo.
+                    schema:
+                      type: string
+                    example: attachment; filename=sales_summary.pdf
           description: ''
   /api/orders/seller/{user_id}/:
     get:
@@ -468,10 +526,6 @@ paths:
       operationId: api_users_create
       tags:
       - Users
-      - Autenticação
-      - Products
-      - Carts
-      - Orders
       requestBody:
         content:
           application/json:
@@ -581,11 +635,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
           description: ''
-  /api/users/address/:
+  /api/users/{user_id}/address/:
     post:
       operationId: api_users_address_create
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
       tags:
-      - Users
+      - Address
       requestBody:
         content:
           application/json:
@@ -606,6 +667,91 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Address'
+          description: ''
+  /api/users/address/{id}/:
+    put:
+      operationId: api_users_address_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Address'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    patch:
+      operationId: api_users_address_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+  /api/users/profile/:
+    get:
+      operationId: api_users_profile_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - Users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
           description: ''
 components:
   schemas:
@@ -804,6 +950,67 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PurchaseOrdersListClient'
+    PaginatedUserList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PatchedAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        country:
+          type: string
+          maxLength: 30
+        state:
+          type: string
+          maxLength: 30
+        city:
+          type: string
+          maxLength: 50
+        district:
+          type: string
+          maxLength: 30
+        street:
+          type: string
+          maxLength: 50
+        number:
+          type: string
+          maxLength: 10
+        cep:
+          type: string
+          pattern: ^\d{5}-\d{3}$
+          maxLength: 9
+        complement:
+          type: string
+          nullable: true
+          maxLength: 100
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_id:
+          type: string
+          format: uuid
+          readOnly: true
     PatchedProduct:
       type: object
       properties:
@@ -929,6 +1136,10 @@ components:
           type: string
           format: uuid
           readOnly: true
+        address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          readOnly: true
     Product:
       type: object
       properties:
@@ -964,6 +1175,7 @@ components:
           format: uuid
           readOnly: true
       required:
+      - category
       - id
       - is_available_for_sale
       - name
@@ -1151,6 +1363,7 @@ components:
       - price
       - quantity_items
       - seller_id
+      - status
       - updated_at
       - user_id
     StatusEnum:
@@ -1233,7 +1446,12 @@ components:
           type: string
           format: uuid
           readOnly: true
+        address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          readOnly: true
       required:
+      - address
       - cart_id
       - cpf
       - created_at
