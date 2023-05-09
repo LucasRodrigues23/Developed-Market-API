@@ -10,6 +10,8 @@ from drf_spectacular.utils import (
     OpenApiExample,
 )
 from drf_spectacular.types import OpenApiTypes
+from addresses.models import Address
+from carts.models import Cart
 
 
 class ProductCartSerializer(serializers.Serializer):
@@ -188,6 +190,17 @@ class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         cart_id = validated_data.pop("cart_id")
 
+        # verifica se o carrinho existe
+        cart_exists = Cart.objects.filter(id=cart_id)
+        if not cart_exists:
+            raise serializers.ValidationError({"message": "cart not found"})
+        # verificação se o usuário tem endereço cadastrado
+        address_exists = Address.objects.filter(user_id=validated_data["user"])
+        if not address_exists:
+            raise serializers.ValidationError(
+                {"message": "register an address to continue"}
+            )
+
         cart_list = CartListProducts.objects.filter(cart_id=cart_id).select_related(
             "product"
         )
@@ -256,12 +269,16 @@ class PurchaseOrdersCreateSerializer(serializers.ModelSerializer):
         cart_list.delete()
         return [order_list, cart_list]
 
+
 class StatusPossibleChoice(serializers.ChoiceField):
     status_options = []
     for item in StatusChoices.choices:
         status_options.append(item[0])
         status_options_str = str(status_options)[1:-1]
-    default_error_messages = {"invalid_choice": _('{input} is not valid! ') + f"The available status are {status_options_str}" }
+    default_error_messages = {
+        "invalid_choice": _("{input} is not valid! ")
+        + f"The available status are {status_options_str}"
+    }
 
 
 class PurchaseOrdersUpdateSerializer(serializers.ModelSerializer):
