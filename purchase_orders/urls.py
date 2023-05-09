@@ -15,4 +15,8 @@ urlpatterns = [
         "orders/<uuid:pk>/seller/",
         views.PurchaseOrderDetailView.as_view(),
     ),
+    path(
+        "orders/sales-summary/seller/<uuid:pk>/",
+        views.PurchaseOrderListGeneratePdfPdfView.as_view(),
+    ),
 ]

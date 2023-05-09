@@ -19,3 +19,16 @@ class IsOrderProductOwner(permissions.BasePermission):
             and obj.seller_id == request.user.id
             or request.user.is_superuser
         )
+
+
+class IsSalesSummaryOwner(permissions.BasePermission):
+    def has_permission(self, request, view: View) -> bool:
+        if request.user.is_authenticated and request.user.is_superuser:
+            return True
+        user_id = request.path.split("/")[5]
+
+        return (
+            request.user.is_authenticated
+            and request.user.is_seller == True
+            and (str(user_id) == str(request.user.id))
+        )
