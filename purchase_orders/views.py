@@ -38,7 +38,7 @@ class PurchaseOrderCreateView(CreateAPIView):
     serializer_class = PurchaseOrdersCreateSerializer
 
     def perform_create(self, serializer):
-        cart_exists = get_object_or_404(Cart, pk=self.kwargs.get("cart_id"))
+        # cart_exists = get_object_or_404(Cart, pk=self.kwargs.get("cart_id"))
         serializer.save(user=self.request.user, cart_id=self.kwargs.get("cart_id"))
 
 
