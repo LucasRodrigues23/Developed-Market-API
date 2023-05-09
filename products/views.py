@@ -5,7 +5,8 @@ from rest_framework.generics import ListCreateAPIView, UpdateAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .permissions import ProductSellerPermission
 from rest_framework.pagination import PageNumberPagination
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiParameter
+from drf_spectacular.types import OpenApiTypes
 
 
 class CustomPaginationProduct(PageNumberPagination):
@@ -14,6 +15,30 @@ class CustomPaginationProduct(PageNumberPagination):
 
 @extend_schema(
     tags=["Products"],
+    methods=["GET"],
+    description="""Lista todos os produtos cadastrados. É possivel realizar
+    filtros na listagem por id, name e categoria do produto. Não é preciso 
+    está logado para acessar a rota.
+    """,
+    parameters=[
+        OpenApiParameter(
+            name="id",
+            description="Id do produto",
+            required=False,
+            type=OpenApiTypes.UUID,
+        ),
+        OpenApiParameter(name="name", description="Nome do produto", required=False),
+        OpenApiParameter(
+            name="category", description="Categoria do produto", required=False
+        ),
+    ],
+)
+@extend_schema(
+    tags=["Products"],
+    methods=["POST"],
+    description="""Cadastra um produto, sendo permitido apenas 
+    para usuários seller e admin.
+    """,
 )
 class ProductView(ListCreateAPIView):
     authentication_classes = [JWTAuthentication]
@@ -47,6 +72,15 @@ class ProductView(ListCreateAPIView):
 
 @extend_schema(
     tags=["Products"],
+    description="""Atualiza o estoque do produto, a partir do id do produto,
+    informado no parâmetro da rota. Só é possível atualizar o estoque do produto
+    pelo vendedor que cadastrou o produto, ou por um usuário admin.
+    """,
+    methods=["PATCH"],
+)
+@extend_schema(
+    methods=["PUT"],
+    exclude=True,
 )
 class StockProductUpdateView(UpdateAPIView):
     authentication_classes = [JWTAuthentication]

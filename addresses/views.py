@@ -8,6 +8,8 @@ from .permissions import IsAddressCreatePermissionr, IsAddressOwner
 
 @extend_schema(
     tags=["Address"],
+    description="""Cria um endereço para um usuário, o qual
+     teve seu id informado nos parâmetros da rota.""",
 )
 class AddressCreateView(CreateAPIView):
     authentication_classes = [JWTAuthentication]
@@ -22,6 +24,13 @@ class AddressCreateView(CreateAPIView):
 
 @extend_schema(
     tags=["Address"],
+    description="""Atualiza um endereço, a partir do seu id
+    informado nos parâmetros da rota.""",
+    methods=["PATCH"],
+)
+@extend_schema(
+    methods=["PUT"],
+    exclude=True,
 )
 class AddressUpdateView(UpdateAPIView):
     authentication_classes = [JWTAuthentication]
