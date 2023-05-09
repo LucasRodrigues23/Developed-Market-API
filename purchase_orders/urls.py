@@ -9,7 +9,7 @@ urlpatterns = [
     ),
     path(
         "orders/seller/<uuid:user_id>/",
-        views.PurchaseOrderListClientView.as_view(),
+        views.PurchaseOrderListSellerView.as_view(),
     ),
     path(
         "orders/<uuid:pk>/seller/",

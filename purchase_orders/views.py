@@ -26,6 +26,10 @@ from purchase_orders.models import PurchaseOrders
 
 @extend_schema(
     tags=["Carts"],
+    description="""Cria o pedido de compra, baseado no carrinho de compras do usuário,
+    a partir do id do carrinho, informado no parâmetro da rota. O usuário logado 
+    precisa ser admin ou dono do carrinho de compras.
+    """,
 )
 class PurchaseOrderCreateView(CreateAPIView):
     authentication_classes = [JWTAuthentication]
@@ -40,6 +44,10 @@ class PurchaseOrderCreateView(CreateAPIView):
 
 @extend_schema(
     tags=["Orders"],
+    description="""Lista os pedidos realizados por um cliente,
+    a partir do id do usuário, informado no parâmetro da rota. O usuário logado 
+    precisa ser admin ou dono das informações.
+    """,
 )
 class PurchaseOrderListClientView(ListAPIView):
     authentication_classes = [JWTAuthentication]
@@ -49,15 +57,46 @@ class PurchaseOrderListClientView(ListAPIView):
     def get_queryset(self):
         client_id = self.kwargs.get("user_id")
         order = get_object_or_404(User, pk=client_id)
-        if self.request.path.__contains__("seller"):
-            return PurchaseOrders.objects.filter(seller_id=client_id).order_by(
-                "updated_at"
-            )
         return PurchaseOrders.objects.filter(user_id=client_id).order_by("updated_at")
 
 
 @extend_schema(
     tags=["Orders"],
+    description="""Lista os pedidos vendidos por um vendedor,
+    a partir do id do usuário, informado no parâmetro da rota. 
+    O usuário logado precisa ser admin ou dono das informações.
+    """,
+)
+class PurchaseOrderListSellerView(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsOrdersOwner]
+    serializer_class = PurchaseOrdersListClientSerializer
+
+    def get_queryset(self):
+        client_id = self.kwargs.get("user_id")
+        order = get_object_or_404(User, pk=client_id)
+        return PurchaseOrders.objects.filter(seller_id=client_id).order_by("updated_at")
+
+
+@extend_schema(
+    tags=["Orders"],
+    methods=["GET"],
+    description="""Lista um pedido vendido por um vendedor,
+    a partir do id do pedido, informado no parâmetro da rota. 
+    O usuário logado precisa ser admin ou dono das informações.
+    """,
+)
+@extend_schema(
+    tags=["Orders"],
+    methods=["PATCH"],
+    description="""Atualizar o status de um pedido vendido por um vendedor,
+    a partir do id do pedido, informado no parâmetro da rota. 
+    O usuário logado precisa ser admin ou dono das informações.
+    """,
+)
+@extend_schema(
+    methods=["PUT"],
+    exclude=True,
 )
 class PurchaseOrderDetailView(RetrieveUpdateAPIView):
     authentication_classes = [JWTAuthentication]
@@ -68,7 +107,10 @@ class PurchaseOrderDetailView(RetrieveUpdateAPIView):
 
 @extend_schema(
     tags=["Orders"],
-    description="Retorna um resumo em PDF das vendas.",
+    description="""Gera um pdf, contendo o resumo de vendas, do vendedor,
+    a partir do id do vendedor, informado no parâmetro da rota. 
+    O usuário logado precisa ser admin ou dono das informações.
+    """,
     responses={
         200: {
             "description": "Arquivo PDF com o resumo das vendas.",

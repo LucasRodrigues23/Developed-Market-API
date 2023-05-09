@@ -22,6 +22,11 @@ class CustomPaginationCartRetrieve(PageNumberPagination):
 
 @extend_schema(
     tags=["Carts"],
+    description="""Adiciona um produto ao carrinho de compras, a partir do id,
+    do carrinho, informado no parâmetro da rota. O id do produto é enviado no
+    body, assim como a quantidade do mesmo. O usuário logado precisa ser admin
+    ou dono do carrinho de compras.
+    """,
 )
 class CartListProductsView(CreateAPIView):
     permission_classes = [IsCartOwner]
@@ -37,6 +42,10 @@ class CartListProductsView(CreateAPIView):
 
 @extend_schema(
     tags=["Carts"],
+    description="""Lista os produtos presentes no carrinho de compras, a partir do id,
+    do carrinho, informado no parâmetro da rota. O usuário logado precisa ser admin
+    ou dono do carrinho de compras.
+    """,
 )
 class CartRetrieve(ListAPIView):
     permission_classes = [IsCartOwner]
@@ -53,6 +62,10 @@ class CartRetrieve(ListAPIView):
 
 @extend_schema(
     tags=["Carts"],
+    description="""Remove um produto do carrinho de compras, a partir do id,
+    do carrinho e do id do produto, informados nos parâmetros da rota.
+     O usuário logado precisa ser admin ou dono do carrinho de compras.
+    """,
 )
 class RemoveProduct(DestroyAPIView):
     permission_classes = [IsCartOwner]

@@ -17,6 +17,8 @@ from rest_framework.response import Response
 
 @extend_schema(
     tags=["Users"],
+    description="""Cria um usuário, podendo ser admin, 
+     seller ou client.""",
 )
 class UserCreateView(CreateAPIView):
     queryset = User.objects.all()
@@ -27,16 +29,20 @@ class UserCreateView(CreateAPIView):
     tags=["Users"],
 )
 @extend_schema(
-    description="testando a descrição por rota GET",
+    description="""Listar informações do usuário, a partir do id
+    informado no parâmetro da rota. O usuário logado precisa ser 
+    admin ou dono das informações.""",
     methods=["GET"],
 )
 @extend_schema(
-    description="testando a descrição por rota PATCH",
+    description="""Atualizar as informações do usuário, a partir do id
+    informado no parâmetro da rota. O usuário logado precisa ser 
+    admin ou dono das informações.""",
     methods=["PATCH"],
 )
 @extend_schema(
-    description="testando a descrição por rota PUT",
     methods=["PUT"],
+    exclude=True,
 )
 class UserDetailView(RetrieveUpdateAPIView):
     authentication_classes = [JWTAuthentication]
@@ -47,12 +53,19 @@ class UserDetailView(RetrieveUpdateAPIView):
 
 @extend_schema(
     tags=["Autenticação"],
+    description="""Utiliza das credencias do usuário (username e password),
+    para realizar autenticação e retorna dois tokens, um de acesso e outro de 
+    atualização.""",
 )
 class LoginJWTView(TokenObtainPairView):
     serializer_class = CustomJWTSerializer
 
 
-@extend_schema(tags=["Autenticação"])
+@extend_schema(
+    tags=["Autenticação"],
+    description="""Utiliza do token de atualização, para gerar um novo token 
+    de acesso.""",
+)
 class MyTokenRefreshView(TokenRefreshView):
     pass
 
@@ -64,6 +77,7 @@ class CustomPaginationUserProfile(PageNumberPagination):
 
 @extend_schema(
     tags=["Users"],
+    description="""Listar informações do usuário logado.""",
 )
 class UserProfileView(ListAPIView):
     authentication_classes = [JWTAuthentication]
